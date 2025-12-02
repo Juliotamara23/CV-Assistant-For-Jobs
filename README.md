@@ -1,4 +1,4 @@
-<h1 style="align: center;">🤖 CV Assistant For Jobs</h1>
+<h1 align: "center;">🤖 CV Assistant For Jobs</h1>
 
 **CV Assistant For Jobs** es un flujo de trabajo automatizado para **n8n** diseñado para actuar como tu coach de carrera personal. Este sistema scrapea ofertas de empleo de Indeed (mas sitios en el futuro), gestiona el registro de usuarios, procesa hojas de vida (CVs) y utiliza Inteligencia Artificial (Google Gemini) para analizar la compatibilidad de tu perfil con múltiples ofertas de trabajo automáticamente.
 
