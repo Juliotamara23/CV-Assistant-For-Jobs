@@ -1,0 +1,3419 @@
+{
+  "name": "CV-Assistant-For-Jobs v2",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3136,
+        960
+      ],
+      "id": "2825606d-797a-4e54-b1ee-8bf052c0bcce",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ef89af04-1058-4c98-8148-2957db2156ab",
+              "leftValue": "={{ $json['Position Name'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "cf9bf108-1d38-41a1-a02d-337c10544b46",
+              "leftValue": "={{ $json['Company Description'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7cb94db5-f260-4a58-90d1-e3e60a4f55ee",
+              "leftValue": "={{ $json['Company Name'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2832,
+        784
+      ],
+      "id": "04a44506-fe85-4303-b68d-945692be4c7c",
+      "name": "If Jobs exists"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Eres un coach experto en búsqueda de trabajo, amigable y profesional.\nInstrucciones de Personalización:\n- Llama al usuario por su nombre de pila (first name) si puedes extraerlo del CV.\n- Mantén un tono de apoyo y motivación.",
+              "role": "model"
+            },
+            {
+              "content": "=CV: En la Tool \"Search files name CV\" puedes buscar la CV del usuario usando el siguiente filtro \"{{ $('Aggregate').item.json.Access_Key[0]['Ingresa tu email'] }}_CV\", La herramienta \"CV\" te permitira obtener el archivo.\n\nLaboral Offer: {{ $json['Company Name'] }}, {{ $json['Position Name'] }}, {{ $json['Company Description'] }}\n\nTu Tarea: Analiza el CV del usuario y la Oferta Laboral suministrada. Tu objetivo es determinar la compatibilidad del candidato para el puesto, evaluando cuidadosamente sus habilidades, experiencias, proyectos y formación académica en relación con los requisitos de la oferta.\n\nInstrucciones de Salida: Tu respuesta DEBE seguir estrictamente el formato pre definido \"Analizes Format\", los pasos para obtenerlo son los siguientes:\n\n1. El archivo \"Analizes Format\" lo puedes optener de la tool \"Get Format\".\n2. Usa la tool \"Copy Format\" para copiar el archivo \"Analyzes Format\".\n3. Usa la tool \"Update Format\" para reemplazar la respuesta por cada etiqueta con el nombre por sección:\n\netiqueta: [COMPARATIVA] Genera una lista de puntos, cada uno comenzando con el símbolo de viñeta unicode • seguido de un espacio. Evalúa los requisitos de la oferta contra el CV.\n\n• [Un requisito de la oferta y cómo se alinea (o no) con la experiencia, habilidades y formación del usuario.] • [Otro requisito de la oferta y su alineación.] • [Continúa la lista con todos los requisitos importantes, usando el símbolo • al inicio de cada punto.]\n\netiqueta: [SUGERENCIAS] Genera una lista de puntos, cada uno comenzando con el símbolo de viñeta unicode • seguido de un espacio. Ofrece sugerencias para maximizar las oportunidades del candidato.\n\n• [Sugerencia concreta para el usuario, p. ej., qué habilidades faltan o cómo mejorar el CV para este tipo de puesto.] • [Otra sugerencia o un área de mejora.]\n\netiqueta: [VEREDICTO_TEXTO] Genera estrictamente solo la palabra \"APTO\" o \"NO APTO\".\n\netiqueta: [veredicto]\n\netiqueta: [CONCLUSION] Genera un resumen motivador y profesional que comience con: \"¡Excelente [nombre]! Encajas en esta oferta porque...\" o \"[nombre], no encajas directamente en esta oferta porque...\". No uses viñetas ni saltos de línea adicionales."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        1456
+      ],
+      "id": "5dcdce6d-1b1d-4769-93af-ef1a164b5241",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 4,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VuMbPYanv9iroKXw",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1202194973,
+          "mode": "list",
+          "cachedResultName": "Indeed Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GQ_iVPqGOrenNZaMcpIkCv9efRuzj4kb6nfQa_srebs/edit#gid=1202194973"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Position Name",
+              "lookupValue": "={{ $json['Position Name'] }}"
+            },
+            {
+              "lookupColumn": "Company Description",
+              "lookupValue": "={{ $json['Company Description'] }}"
+            },
+            {
+              "lookupColumn": "Company Name",
+              "lookupValue": "={{ $json['Company Name'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3120,
+        768
+      ],
+      "id": "e5057939-6df6-4f1a-b3aa-81e59fe9e345",
+      "name": "Indeed Jobs Sheet (GET)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "paQ9mTdJ9l2YVFu4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1202194973,
+          "mode": "list",
+          "cachedResultName": "Indeed Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16PMUUMf7ZqWROXnD_-bFQSildwooqnEBbeoK77Iscms/edit#gid=1202194973"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Posted At": "={{ $json['Posted At'] }}",
+            "Company Description": "={{ $json['Company Description'] }}",
+            "Position Name": "={{ $json['Position Name'] }}",
+            "Company Name": "={{ $json['Company Name'] }}",
+            "Location": "={{ $json.Location }}",
+            "Job Type": "={{ $json['Job Type'] }}",
+            "Salary": "={{ $json.Salary }}",
+            "Indeed link": "={{ $json['Indeed link'] }}",
+            "Posted Days": "={{ $json['Posted Days'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Posted At",
+              "displayName": "Posted At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Posted Days",
+              "displayName": "Posted Days",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Position Name",
+              "displayName": "Position Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company Description",
+              "displayName": "Company Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Type",
+              "displayName": "Job Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Salary",
+              "displayName": "Salary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Indeed link",
+              "displayName": "Indeed link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company Website",
+              "displayName": "Company Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Analysis",
+              "displayName": "Analysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Veredict",
+              "displayName": "Veredict",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Analysis URL",
+              "displayName": "Analysis URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2640,
+        784
+      ],
+      "id": "df18c381-878e-4251-b261-bf7035fedbea",
+      "name": "Indeed Jobs Sheet (SET)",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "paQ9mTdJ9l2YVFu4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3312,
+        1264
+      ],
+      "id": "515bd973-bf06-4a6a-b204-40ca23996948",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "folderId": "1FIor6uhnGHfBJJ3LWg217doMRuaAsuKa",
+        "title": "={{ $('Indeed Jobs Sheet (GET)').item.json['Position Name'] }} - Analysis"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        1456
+      ],
+      "id": "2c0561a1-d0f0-4135-81b7-917c955aee8e",
+      "name": "Create Analysis Doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "locationChoice": "location"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        1456
+      ],
+      "id": "f449b2ad-28fc-4797-9752-24c16dc5baef",
+      "name": "Update Analysis Doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      },
+      "disabled": true,
+      "notes": "{{ $('Message a model').item.json.content.parts[0].text }}"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1202194973,
+          "mode": "list",
+          "cachedResultName": "Indeed Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PnCRW4N36mGEsnpQFEeHG1HHpjsuMC_MvIdo-rRGiZY/edit#gid=1202194973"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": 0,
+            "Veredict": "={{ $('Code in JavaScript').item.json.VEREDICTO_TEXTO }}",
+            "Analysis URL": "=https://docs.google.com/document/d/{{ $('Copy Analyses Format').item.json.id }}",
+            "Analysis": "DONE",
+            "Position Name": "={{ $('Indeed Jobs Sheet (GET)').item.json[\"Position Name\"] }}"
+          },
+          "matchingColumns": [
+            "Position Name"
+          ],
+          "schema": [
+            {
+              "id": "Posted At",
+              "displayName": "Posted At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Posted Days",
+              "displayName": "Posted Days",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Position Name",
+              "displayName": "Position Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company Description",
+              "displayName": "Company Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job Type",
+              "displayName": "Job Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Salary",
+              "displayName": "Salary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Indeed link",
+              "displayName": "Indeed link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company Website",
+              "displayName": "Company Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Analysis",
+              "displayName": "Analysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Veredict",
+              "displayName": "Veredict",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Analysis URL",
+              "displayName": "Analysis URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4656,
+        1760
+      ],
+      "id": "4685b19c-ba9c-43a4-b6d4-7e8ba53dd61a",
+      "name": "Update Indeed Jobs Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "paQ9mTdJ9l2YVFu4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.documentId }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Aggregate').item.json.Access_Key[0]['Ingresa tu clave de acceso'] }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1616,
+        1664
+      ],
+      "id": "4da5c4c4-b50e-4605-b846-421720e58b5c",
+      "name": "Move file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doc_ID_or_URL', ``, 'string') }}",
+        "simple": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify', ``, 'boolean') }}"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        1648
+      ],
+      "id": "f51fe080-f6fb-405d-95ee-1e3a7bea046e",
+      "name": "CV",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search_Query', ``, 'string') }}",
+        "filter": {
+          "driveId": {
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "whatToSearch": "files",
+          "fileTypes": [
+            "application/vnd.google-apps.document"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        928,
+        1600
+      ],
+      "id": "e746235f-8cbc-4385-8b3c-1fc07a4025dc",
+      "name": "Search files name CV",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Keywords",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        928
+      ],
+      "id": "97503d9d-d8ae-4fc7-ba9c-ce8e0d39f7c6",
+      "name": "Jobs Keyword",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "paQ9mTdJ9l2YVFu4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        592,
+        768
+      ],
+      "id": "7840cec0-6913-4739-8467-0134b5f2ff46",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1808,
+        768
+      ],
+      "id": "eeada2ce-07c3-44fc-8028-910c729ce8a9",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=Sube_tu_CV",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        368,
+        464
+      ],
+      "id": "a4cc37fd-0dcc-4aca-adb5-76faae7bbe6d",
+      "name": "Extract Text"
+    },
+    {
+      "parameters": {
+        "jsCode": "const textKey = 'text'; // La propiedad que contiene el texto del CV\nconst cleanTextKey = 'clean_cv_text'; // La nueva propiedad donde se guardará el texto limpio\n\n// Recorrer los items de entrada\nfor (const item of items) {\n    const rawText = item.json[textKey];\n    let cleanedText = '';\n    let validationMessage = '';\n\n    if (!rawText || typeof rawText !== 'string') {\n        validationMessage = `El campo '${textKey}' no es una cadena válida.`;\n        cleanedText = '';\n    } else {\n        // 1. Reemplazar saltos de línea y retornos de carro por un solo espacio.\n        cleanedText = rawText.replace(/[\\r\\n]+/g, ' ');\n\n        // 2. Reemplazar múltiples espacios consecutivos por un solo espacio.\n        // Esto elimina espacios extra creados en el paso anterior.\n        cleanedText = cleanedText.replace(/[ \\t]+/g, ' ');\n\n        // 3. Eliminar espacios al inicio y al final del texto.\n        cleanedText = cleanedText.trim();\n        \n        validationMessage = `Texto limpiado: ${cleanedText.length} caracteres finales.`;\n    }\n\n    // Agregar el texto limpio y el mensaje de validación al ítem\n    item.json[cleanTextKey] = cleanedText;\n    item.json.cleanupMessage = validationMessage;\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        464
+      ],
+      "id": "d8e06132-03da-486a-afe4-6455bda05db3",
+      "name": "Format Cleaner"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $('Register').item.json['Ingresa tu email'] }}_Jobs",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1JmLSoBxWtiUeMNoWJyPk4sAGNY-piHM6",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1248,
+        16
+      ],
+      "id": "370f318a-a6ef-4bd6-a2e5-0444fdd086af",
+      "name": "Create User Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Update CV Doc').item.json.documentId }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create User Folder').item.json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1072,
+        256
+      ],
+      "id": "69ef9a99-a3be-468c-b968-e6cab4199ed2",
+      "name": "Move CV Doc",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "1FIor6uhnGHfBJJ3LWg217doMRuaAsuKa",
+        "title": "={{ $('Register').item.json['Ingresa tu email'] }}_CV"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        896,
+        16
+      ],
+      "id": "75c0b909-145e-4f41-a891-b9a997e5267e",
+      "name": "Create CV Doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Format Cleaner').item.json.clean_cv_text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        16
+      ],
+      "id": "3d579eff-6d86-49fe-8396-5574fcc0ef5c",
+      "name": "Update CV Doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1yhCW96Fzu2mwEBno1WEEs8TzlqjVPLN9dvPRPRZ5QT8",
+          "mode": "list",
+          "cachedResultName": "Jobs sheets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yhCW96Fzu2mwEBno1WEEs8TzlqjVPLN9dvPRPRZ5QT8/edit?usp=drivesdk"
+        },
+        "name": "={{ $json.name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        896,
+        256
+      ],
+      "id": "8be030a3-1b34-4592-b2e7-0da54e6bf23e",
+      "name": "Copy (Original) Jobs Sheet",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Copy (Original) Jobs Sheet').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create User Folder').item.json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1248,
+        256
+      ],
+      "id": "955317b3-f7a1-4959-bb8b-cba40e64cad7",
+      "name": "Move Jobs Sheet",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Keywords",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NahL8J6kUp1PgwJGNkjuX-oyKOEewufrYipv1nGyp5Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keywords": "={{ $('Proccessing Data Form').item.json['Palabras Clave'] }}",
+            "Number of Jobs": "={{ $('Proccessing Data Form').item.json['Número de Empleos'] }}",
+            "country": "={{ $('Proccessing Data Form').item.json.country_code }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keywords",
+              "displayName": "Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Number of Jobs",
+              "displayName": "Number of Jobs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        464
+      ],
+      "id": "66ddd07b-ca1b-422b-8bb9-8dc05910d79c",
+      "name": "Keywords (SET)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "paQ9mTdJ9l2YVFu4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n    <style>\n        .container {\n            font-family: Arial, sans-serif;\n            line-height: 1.6;\n            color: #333;\n            max-width: 600px;\n            margin: 0 auto;\n            border: 1px solid #ddd;\n            padding: 20px;\n            border-radius: 8px;\n        }\n        .header {\n            color: #007bff;\n            border-bottom: 2px solid #007bff;\n            padding-bottom: 10px;\n            margin-bottom: 20px;\n        }\n        .id-box {\n            background-color: #f4f4f4;\n            padding: 15px;\n            border-radius: 4px;\n            text-align: center;\n            margin: 20px 0;\n            border: 1px dashed #ccc;\n        }\n        .id-text {\n            font-size: 1.2em;\n            font-weight: bold;\n            color: #d9534f; /* Color de énfasis para el ID */\n            display: block;\n            word-break: break-all; /* Asegura que el ID se muestre completo */\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <h2 class=\"header\"> Carpeta de Documentos de analisis</h2>\n\n        <p>Estimado/a usuario,</p>\n        \n        <p>Confirmamos que tu carpeta personal en Google Drive ha sido creada exitosamente!.</p>\n\n        <div class=\"id-box\">\n            <p style=\"margin-top: 0;\">**ID ÚNICO DE TU CARPETA**</p>\n            <span class=\"id-text\">\n                {{ $('Create User Folder').item.json.id }}\n            </span>\n            <p style=\"margin-bottom: 0; font-size: 0.9em; color: #555;\">(Haz clic y copia este identificador completo)</p>\n        </div>\n\n        <p><strong>Pasos a seguir:</strong></p>\n        <ol>\n            <li>**Copia el ID Único** mostrado arriba.</li>\n            <li>Regresa a la pagina y **pega el ID** en el campo solicitado.</li>\n            <li>Una vez completado el paso, podrás se procesara tu analisis.</li>\n        </ol>\n\n        <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>\n\n        <p>Atentamente,<br>\n        Julio Andrés Támara from CV Assistant For Jobs</p>\n    </div>\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1056,
+        464
+      ],
+      "id": "305c848f-a52d-434c-a8a5-d61579d52784",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Register').item.json['Ingresa tu email'] }}",
+        "subject": "Get your folder CV and Jobs list ID!",
+        "message": "={{ $('HTML').item.json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1248,
+        464
+      ],
+      "id": "a6c5b4cb-5608-4135-a3e9-d5195c9531b9",
+      "name": "Send a message",
+      "webhookId": "424358c8-8e92-4325-b168-af11293c96be",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "HoKtwm3snvMTwhWn",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "af16187b-abba-4be2-81d3-3f9b309d123d",
+              "leftValue": "={{ $json.Analysis }}",
+              "rightValue": "DONE",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3392,
+        960
+      ],
+      "id": "9b9adeb7-9ffb-4377-b28a-588a5a78cf32",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3600,
+        944
+      ],
+      "id": "cfc52dcb-4b29-464a-a723-c5b981667c86",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        3968,
+        1200
+      ],
+      "id": "cbd8fa81-f887-4076-bab9-59e0fe3228c9",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4c3ee506-98e9-4a7a-8aa5-0f95ea91770d",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "={{ $('Aggregate').item.json.Access_Key[0]['Ingresa tu clave de acceso'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "08b1a983-4f76-4b78-aca5-0a92703db44a",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "={{ $('Aggregate').item.json.Access_Key[0]['Ingresa tu email'] }}_Jobs",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        784
+      ],
+      "id": "ac16d7f0-42a7-42f1-a87c-21faa8d077a8",
+      "name": "If",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "respondWith": "redirect",
+        "redirectUrl": "https://julio23.app.n8n.cloud/form/d55fdf38-430c-4947-961b-ed0013085655",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        592,
+        960
+      ],
+      "id": "e3a1013d-43e6-49b6-b6fe-d9796c93963d",
+      "name": "Form",
+      "webhookId": "7412b88f-3ed6-42e1-bed5-9f5709978cfd"
+    },
+    {
+      "parameters": {
+        "jsCode": "function processItem(item) {\n    // Tomamos la data del item\n    const data = item.json;\n\n    // 1. Conversión del País: Extrae el código de dos letras.\n    // La data de entrada es 'País': \"Colombia - CO\"\n    const fullCountryName = data['País'];\n    \n    if (fullCountryName && typeof fullCountryName === 'string' && fullCountryName.length >= 2) {\n        // Usamos slice(-2) para obtener las últimas dos letras (\"CO\", \"AR\", etc.)\n        const countryCode = fullCountryName.slice(-2);\n        \n        // Creamos un nuevo campo para el código limpio, se mantene el original por si acaso.\n        data['country_code'] = countryCode;\n    }\n\n    // 2. Validación del campo 'Número de Empleos'\n    const numJobs = data['Número de Empleos'];\n\n    // Convertir a número\n    const numValue = Number(numJobs);\n\n    if (isNaN(numValue)) {\n        throw new Error('El campo \"Número de Empleos\" debe ser un valor numérico.');\n    }\n\n    // Validación 2.1: No debe ser negativo (debe ser al menos 1)\n    if (numValue < 1) {\n        throw new Error(`El valor ingresado para \"Número de Empleos\" (${numValue}) no puede ser menor a 1.`);\n    }\n\n    // Validación 2.2: Rango máximo de 50\n    if (numValue > 50) {\n        throw new Error(`El valor ingresado para \"Número de Empleos\" (${numValue}) excede el límite máximo de 50.`);\n    }\n    \n    // Si la validación es exitosa, podemos sobrescribir el campo original con el valor numérico limpio.\n    data['Número de Empleos'] = numValue;\n\n    return item;\n}\n\n// ----------------------------------------------------------------------\n// Lógica de Ejecución (Punto de entrada de n8n)\n// ----------------------------------------------------------------------\n\nconst processedItems = [];\n\n// Recorremos todos los elementos de entrada.\nfor (const item of items) {\n    try {\n        const result = processItem(item);\n        processedItems.push(result);\n    } catch (error) {\n        // En n8n, lanzar un error detendrá el procesamiento de este elemento.\n        throw new Error(`Error en la data del formulario: ${error.message}`);\n    }\n}\n\nreturn processedItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        464
+      ],
+      "id": "72330cf9-0f2f-471c-8c50-6d23391362ef",
+      "name": "Proccessing Data Form"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "Access_Key",
+        "include": "allFieldsExcept",
+        "fieldsToExclude": "submittedAt",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        48,
+        784
+      ],
+      "id": "798cca5b-f0fa-4cfe-b772-9801f50bfaad",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $json['Ingresa tu email'] }}_Jobs",
+        "returnAll": true,
+        "filter": {
+          "driveId": {
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1JmLSoBxWtiUeMNoWJyPk4sAGNY-piHM6",
+            "mode": "id"
+          },
+          "whatToSearch": "folders"
+        },
+        "options": {
+          "fields": [
+            "id",
+            "name"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        192,
+        272
+      ],
+      "id": "5b617ae6-ea0e-4de1-9ce4-4854e6e5b4d3",
+      "name": "Search User Files",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "respondWith": "redirect",
+        "redirectUrl": "https://julio23.app.n8n.cloud/form/d55fdf38-430c-4947-961b-ed0013085655",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        112
+      ],
+      "id": "df8174cf-dade-4fa0-894b-958424c04723",
+      "name": "Redirect Already Registers",
+      "webhookId": "e2ce7d79-7081-472f-bda7-1999fa52a56e"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "useDataOfInput": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        304
+      ],
+      "id": "543477a9-b6ca-4d43-a168-f9c343864011",
+      "name": "Choose Branch 2"
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "html",
+              "html": "<h2>En tu correo encontraras tu clave de acceso</h2>"
+            },
+            {
+              "fieldLabel": "Ingresa tu clave de acceso",
+              "requiredField": true
+            },
+            {
+              "fieldName": "Ingresa tu email",
+              "fieldType": "hiddenField",
+              "fieldValue": "={{ $('Register').item.json['Ingresa tu email'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        1440,
+        464
+      ],
+      "id": "9bf31e73-798a-4c4d-9841-7bc2613afee2",
+      "name": "ID Access Form",
+      "webhookId": "95757b23-93f3-471c-8c43-b13e8ebafe3c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bebef62f-6599-4d5f-86e8-53fce9f9b855",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "={{ $('Register').item.json['Ingresa tu email'] }}_Jobs",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        272
+      ],
+      "id": "2292060a-388c-4220-984e-f48663449111",
+      "name": "User Validation"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "66ade212-c176-4338-be4e-40277ff29b16",
+              "leftValue": "={{ $json[\"Ingresa tu email\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f1dcf92a-4c79-4f7b-aa32-33a6668e5da9",
+              "leftValue": "={{ $json[\"Ingresa tu clave de acceso\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "78b89f5d-c93b-4c45-ad56-166ea293b25b",
+              "leftValue": "={{ $json['¿Aun no tienes cuenta? (Escoge ¡Registrarse!  y presiona enviar)'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        768
+      ],
+      "id": "926694ed-e0fe-480b-8216-1c7fb0a8e3d2",
+      "name": "Register Or Not"
+    },
+    {
+      "parameters": {
+        "formTitle": "Login",
+        "formDescription": "Asistente de compatibilidad laboral y gestión de análisis",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Ingresa tu email",
+              "fieldType": "email",
+              "placeholder": "email@email.com"
+            },
+            {
+              "fieldLabel": "Ingresa tu clave de acceso",
+              "fieldType": "password"
+            },
+            {
+              "fieldLabel": "¿Aun no tienes cuenta? (Escoge ¡Registrarse!  y presiona enviar)",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "¡Registrarse! "
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "buttonLabel": "Enviar"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -336,
+        768
+      ],
+      "id": "00871ebc-7ce8-4bca-bd67-3a8b053095e4",
+      "name": "Login",
+      "webhookId": "d55fdf38-430c-4947-961b-ed0013085655"
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "[\n  {\n    \"fieldLabel\": \"Ingresa tu email\",\n    \"fieldType\": \"email\",\n    \"placeholder\": \"email@email.com\",\n    \"requiredField\": true\n  },\n  {\n    \"fieldLabel\": \"Palabras Clave\",\n    \"fieldType\": \"text\",\n    \"placeholder\": \"Ej. Desarrollador, NodeJS\",\n    \"requiredField\": true\n  },\n  {\n    \"fieldLabel\": \"Número de Empleos\",\n    \"fieldType\": \"hiddenField\",\n    \"fieldValue\": \"1\",\n    \"placeholder\": \"Número de empleos a buscar\",\n    \"requiredField\": true\n  },\n  {\n    \"fieldLabel\": \"País\",\n    \"fieldType\": \"dropdown\",\n    \"placeholder\": \"Selecciona un País\",\n    \"requiredField\": true,\n    \"fieldOptions\": {\n      \"values\": [\n        {\n          \"option\": \"Argentina - AR\"\n        },\n        {\n          \"option\": \"Bolivia - BO\"\n        },\n        {\n          \"option\": \"Brasil - BR\"\n        },\n        {\n          \"option\": \"Chile - CL\"\n        },\n        {\n          \"option\": \"Colombia - CO\"\n        },\n        {\n          \"option\": \"Costa Rica - CR\"\n        },\n        {\n          \"option\": \"Cuba - CU\"\n        },\n        {\n          \"option\": \"Ecuador - EC\"\n        },\n        {\n          \"option\": \"El Salvador - SV\"\n        },\n        {\n          \"option\": \"Guatemala - GT\"\n        },\n        {\n          \"option\": \"Honduras - HN\"\n        },\n        {\n          \"option\": \"México - MX\"\n        },\n        {\n          \"option\": \"Nicaragua - NI\"\n        },\n        {\n          \"option\": \"Panamá - PA\"\n        },\n        {\n          \"option\": \"Paraguay - PY\"\n        },\n        {\n          \"option\": \"Perú - PE\"\n        },\n        {\n          \"option\": \"República Dominicana - DO\"\n        },\n        {\n          \"option\": \"Uruguay - UY\"\n        },\n        {\n          \"option\": \"Venezuela - VE\"\n        }\n      ]\n    }\n  },\n    {\n    \"fieldLabel\": \"Sube tu CV\",\n    \"fieldType\": \"file\",\n    \"multipleFiles\": false,\n    \"acceptFileTypes\": \".pdf\",\n    \"requiredField\": true\n  }\n]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        16,
+        464
+      ],
+      "id": "3a49ef30-1ef4-4c96-9206-57bc34e61b39",
+      "name": "Register",
+      "webhookId": "5bbdee3a-a5f4-490e-9451-15c8ed9ac50e"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=",
+        "filter": {
+          "driveId": {
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1JmLSoBxWtiUeMNoWJyPk4sAGNY-piHM6",
+            "mode": "id"
+          },
+          "whatToSearch": "folders"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        240,
+        784
+      ],
+      "id": "9435e5c1-0b35-475b-ab0a-b9d5ae3c30c0",
+      "name": "Check Files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "=1K64HdLvd5QPy8oMJj1HUJa2QCCXcB3YF3cgq_o-iWf8",
+          "mode": "id"
+        },
+        "name": "={{ $('Indeed Jobs Sheet (GET)').item.json['Position Name'] }} - Analyzes",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu clave de acceso\"] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        1312,
+        1648
+      ],
+      "id": "e4e3ac66-869e-410c-afba-50c544528a3e",
+      "name": "Copy Format",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1K64HdLvd5QPy8oMJj1HUJa2QCCXcB3YF3cgq_o-iWf8/edit?usp=sharing",
+        "simple": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify', `El contenido de la respuesta debe encajar con cada etiqueta:\n[[COMPARATIVA]]\n[[SUGERENCIAS]]\n[[VEREDICTO_TEXTO]]\n[[CONCLUSION]]`, 'boolean') }}"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        1648
+      ],
+      "id": "8bb0b74c-f54d-4581-bf52-343aa4023513",
+      "name": "Get Format",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doc_ID_or_URL', `ID del documento copiado de \"Analyses Format\"`, 'string') }}",
+        "simple": "=",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('actionFields0_Old_Text', `Las etiqueta con el nombre por sección a reemplazar:\n[COMPARATIVA]\n[SUGERENCIAS]\n[VEREDICTO_TEXTO]\n[CONCLUSION]`, 'string') }}",
+              "replaceText": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('actionFields0_New_Text', `El contenido de la respuesta debe ser remplazado por cada etiqueta:\n[COMPARATIVA]\n[SUGERENCIAS]\n[VEREDICTO_TEXTO]\n[CONCLUSION]`, 'string') }}",
+              "matchCase": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('actionFields0_Match_Case', ``, 'boolean') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        1648
+      ],
+      "id": "414451e8-8991-40db-943a-eb05c6b1e3ec",
+      "name": "Update Format",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu email\"] }}",
+        "filter": {
+          "driveId": {
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu clave de acceso\"] }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files",
+          "fileTypes": [
+            "application/vnd.google-apps.document"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3776,
+        1344
+      ],
+      "id": "0c349206-6115-400d-b20c-ecc46f0e8313",
+      "name": "Search files and folders1",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        3984,
+        1344
+      ],
+      "id": "18c6c4fb-3e9c-4a6b-b81f-0cb4b972a7cb",
+      "name": "Get a document1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst result = items.map((item) => {\n    // Asume que el texto de la IA está en 'content.parts[0].text'\n    const text = item.json.content.parts[0].text;\n    const parsedSections = {};\n\n    // 1. Expresión regular para encontrar los bloques.\n    // Captura el marcador [SECTION] y el contenido subsiguiente hasta el próximo marcador.\n    // [\\s\\S]*? - Captura cualquier carácter, incluyendo saltos de línea, de forma no codiciosa.\n    // Usamos el flag 'g' para encontrar todas las coincidencias.\n    const regex = /\\[(\\w+)\\]([\\s\\S]*?)(?=\\[|$)/g; \n    \n    let match;\n\n    // 2. Iterar sobre todas las coincidencias encontradas\n    while ((match = regex.exec(text)) !== null) {\n        // match[1]: Contiene el nombre del marcador (ej., COMPARATIVA)\n        const sectionName = match[1].trim(); \n        \n        // match[2]: Contiene el contenido de la sección (con el \\n inicial)\n        let sectionContent = match[2];\n        \n        // 3. Limpieza: Eliminar cualquier espacio o salto de línea al inicio\n        // que pudiera haber quedado justo después del corchete de apertura.\n        // Pero no el salto de línea de la primera línea de contenido.\n        // Por lo general, 'trim()' no es lo que queremos, pero aquí aseguramos limpiar \n        // solo el exceso de espacio/saltos de línea alrededor de la sección.\n        if (sectionContent) {\n            // El primer caracter después del marcador es el que queremos preservar\n            // No usamos trim() aquí para preservar el '\\n' inicial si existe.\n            sectionContent = sectionContent.trim();\n        }\n\n        // 4. Asignar el contenido a la propiedad correspondiente\n        parsedSections[sectionName] = sectionContent;\n    }\n\n    return { json: parsedSections, pairedItem: item.pairedItem };\n});\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3872,
+        1584
+      ],
+      "id": "5804e3b3-301c-4981-b39e-e5ae66d8677b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "content": "# 📝Register Section ",
+        "height": 640,
+        "width": 1600
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "b2a0655d-86be-4133-b838-d70ecf14e6ce",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres un coach experto en búsqueda de trabajo, amigable y profesional.\nInstrucciones de Personalización:\n- Llama al usuario por su nombre de pila (first name) si puedes extraerlo del CV (si no se encuentra ningun CV Entonces tu respuesta sera \"Lo siento pero no hay información en tu CV\").\n- Mantén un tono de apoyo y motivación.",
+              "role": "model"
+            },
+            {
+              "content": "=CV: {{ $json.content }}.\n\nLaboral Offer: {{ $('Indeed Jobs Sheet (GET)').item.json[\"Company Name\"] }}, {{ $('Indeed Jobs Sheet (GET)').item.json[\"Position Name\"] }}, \n{{ $('Indeed Jobs Sheet (GET)').item.json[\"Company Description\"] }}\n\nTu Tarea: Analiza el CV del usuario y la Oferta Laboral suministrada. Tu objetivo es determinar la compatibilidad del usuario para el puesto, evaluando cuidadosamente sus habilidades, experiencias, proyectos y formación académica en relación con los requisitos de la oferta.\n\nInstrucciones de Salida: Tu respuesta DEBE ser una única cadena de texto (string). Cada ítem de las secciones COMPARATIVA y SUGERENCIAS debe comenzar con el símbolo ● seguido de un espacio, cada item debe ir separado por un salto de línea (\\n).\n\nQue no debes hacer:\nNo uses JSON, Markdown ni HTML, incluir otro campo en la respuesta.\n\n[COMPARATIVA] Genera una lista de puntos, evaluando los requisitos de la oferta contra el CV. De la siguiente forma:\n\n● [Requisito cotra alineación.]\\n\n\n[Continúa la lista con todos los requisitos importantes, usando ● y \\n.]\n\n[SUGERENCIAS] Genera una lista de puntos. Ofreciendo sugerencias concretas para el candidato. De la siguiente forma:\n\n● [Sugerencia concreta.]\\n\n\n[Continúa la lista con todos las sugerencias,usando ● y \\n.]\n\n[VEREDICTO_TEXTO] Genera estrictamente solo la palabra \"APTO\" o \"NO APTO\".\n[veredicto]\n\n[CONCLUSION] Genera un resumen motivador y profesional que comience con: \"¡Excelente [nombre]! Encajas en esta oferta porque...\" o \"[nombre], no encajas directamente en esta oferta porque...\". No uses viñetas ni saltos de línea adicionales."
+            }
+          ]
+        },
+        "options": {
+          "thinkingBudget": -1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3584,
+        1584
+      ],
+      "id": "0231e4e2-6d6b-4743-b642-aa22205fd852",
+      "name": "Coach experto",
+      "retryOnFail": true,
+      "maxTries": 4,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VuMbPYanv9iroKXw",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 📝 CV-Assistant-For-Jobs\n\nEsta automatización es un **asistente de compatibilidad laboral y gestión de análisis** que opera a partir de las preferencias de búsqueda de un usuario registrado. Su objetivo principal es **analizar automáticamente las ofertas de trabajo** relevantes y el **currículum vitae (CV)** del usuario para generar un **informe de compatibilidad profesional, estructurado y listo para usar en Google Docs**, así como gestionar las notificaciones correspondientes.\n\n### 🚀 Funcionalidades Clave:\n\n* **Gestión de Usuario y Preferencias (Login/Registro):** Permite a los usuarios registrarse o iniciar sesión, definiendo sus parámetros de búsqueda (palabras clave, número de trabajos, país) para personalizar el proceso de *scrapping*.\n* **Adquisición de Datos y Filtrado:** Busca y obtiene ofertas de trabajo de fuentes externas, aplicando un filtro inicial para **descartar ofertas previamente analizadas** (`DONE`) antes de cualquier procesamiento costoso.\n* **Análisis de Compatibilidad (IA):** Para cada oferta nueva, accede al CV del usuario y utiliza un modelo de IA para generar una **evaluación detallada de compatibilidad** (APTO/NO APTO), cubriendo requisitos y áreas de mejora.\n* **Generación de Documentos Profesionales:** La salida de la IA se parsea y se inyecta en una **plantilla formateada de Google Docs**, asegurando un informe de análisis final que es visualmente profesional y fácil de leer.\n* **Notificación de Resumen:** Envía un **único correo electrónico de resumen** al finalizar el procesamiento de todo el lote de trabajos, listando los informes creados y confirmando la conclusión de la tarea.",
+        "height": 560,
+        "width": 640,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1056,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "7d511a51-c641-4510-ab7e-a521b5e20ff6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "✅ Análisis de Ofertas Finalizado",
+        "completionMessage": "!Revisa tu correo encontraras los links a google sheet (con la lista de trabajos) y el link a los documentos con el analices para cada trabajo",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        4368,
+        1200
+      ],
+      "id": "f874e4be-a5ce-476c-b3bd-62c1d6a8252f",
+      "name": "Completion Form",
+      "webhookId": "8e32e8b7-bb98-4044-8bd6-8c838f679ed7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4bd8e083-208c-44e9-869c-98b5317a4161",
+              "leftValue": "={{ $json.COMPARATIVA }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "d91f2250-07d6-4de2-86f7-a5c82f4a506c",
+              "leftValue": "={{ $json.SUGERENCIAS }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "a1478240-4db3-4f60-8583-f377dbe0c2ef",
+              "leftValue": "={{ $json.VEREDICTO_TEXTO }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "733cadcc-a8fa-4ad7-a43c-bc05a1f909d6",
+              "leftValue": "={{ $json.CONCLUSION }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4064,
+        1584
+      ],
+      "id": "747c005e-3c0a-463a-99bb-5bf57d8c1924",
+      "name": "Validation Sections"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.documentId }}",
+          "mode": "id"
+        },
+        "name": "={{ $('Indeed Jobs Sheet (GET)').item.json['Position Name'] }} - Analysis",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu clave de acceso\"] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4512,
+        1568
+      ],
+      "id": "9181facb-a53d-4628-bd44-5092fe0337bd",
+      "name": "Copy Analyses Format",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "1K64HdLvd5QPy8oMJj1HUJa2QCCXcB3YF3cgq_o-iWf8"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        4304,
+        1568
+      ],
+      "id": "2bd0bfc8-8bb4-49d7-a644-1190a950dbb6",
+      "name": "Get Analyses Format",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu email\"] }}",
+        "subject": "Your CV Analysis its ready!",
+        "message": "={{ $json.final_email_html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        4160,
+        1200
+      ],
+      "id": "78e2a926-b37b-417e-8e41-ca97ccc26d23",
+      "name": "Send Final Email",
+      "webhookId": "fbd6ca55-6e20-4144-a262-c8ec3abac162",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "HoKtwm3snvMTwhWn",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const FolderLink = $('Aggregate').first().json.Access_Key[0][\"Ingresa tu clave de acceso\"]\n\nfunction generateAnalysisSummaryHtml(items) {\n    let resultsListHtml = '';\n    let analyzedCount = 0;\n    \n    // 1. Iterar sobre todos los ítems de entrada (Jobs procesados y descartados)\n    for (const item of items) {\n        // Accedemos a las propiedades del JSON del ítem actual.\n        const companyName = item.json['Company Name'];\n        const positionName = item.json['Position Name'];\n        const analysisUrl = item.json['Analysis URL'];\n        \n        // 2. Filtro (Solo incluir aquellos que tienen la URL de análisis)\n        if (analysisUrl) {\n            analyzedCount++; // Contamos solo los que tienen análisis\n            \n            // 3. Construir la plantilla HTML para el ítem actual\n            resultsListHtml += `\n                <li class=\"result-item\">\n                    <span class=\"company-name\">Análisis de la empresa: \"${companyName}\" para el puesto de: ${positionName} </span>:\n                    <a href=\"${analysisUrl}\" class=\"doc-link\" target=\"_blank\">Ver Documento de Google</a>\n                </li>\n            `;\n        }\n    }\n    \n    // 4. Construir el HTML completo del cuerpo del correo (incluyendo los estilos)\n    const totalItemsProcessed = items.length;\n\n    const finalHtml = `\n        <!DOCTYPE html>\n        <html>\n        <head>\n            <style>\n                .container { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }\n                .header { color: #28a745; border-bottom: 2px solid #28a745; padding-bottom: 10px; margin-bottom: 20px; }\n                .result-list { list-style-type: none; padding: 0; }\n                .result-item { margin-bottom: 15px; padding: 10px; border-left: 3px solid #007bff; background-color: #f8f9fa; }\n                .company-name { font-weight: bold; color: #333; }\n                .doc-link { display: block; margin-top: 5px; color: #007bff; word-break: break-all; }\n            </style>\n        </head>\n        <body>\n            <div class=\"container\">\n                <h2 class=\"header\">✅ Análisis de Ofertas Finalizado</h2>\n\n                <p>Confirmamos que el procesamiento de las ofertas de trabajo seleccionadas ha concluido.</p>\n                \n                <p>Se analizaron un total de <strong>${totalItemsProcessed}</strong> Trabajos.</p>\n\n                <h3>Resultados del Análisis:</h3>\n                \n                <ul class=\"result-list\">\n                    ${resultsListHtml || '<li>No se requirió análisis para las ofertas de este lote o los datos están incompletos.</li>'}\n                </ul>\n                \n                <p>Puedes acceder a cada informe haciendo clic en el enlace correspondiente.</p>\n                <p>Recuerda que todos tus trabajos y analisis estan en tu carpeta personal <a href=\"https://drive.google.com/drive/folders/${FolderLink}\" class=\"doc-link\" target=\"_blank\">📁<strong>Aquí</strong></a></p>\n\n                <p>Saludos cordiales,</p>\n            </div>\n        </body>\n        </html>\n    `;\n    \n    return finalHtml;\n}\n\n// ----------------------------------------------------------------------\n// Lógica de Ejecución (Punto de entrada de n8n)\n// ----------------------------------------------------------------------\n\n// Usamos el primer ítem para almacenar el resultado final.\nconst firstItem = items[0]; \n\nif (!firstItem) {\n    throw new Error(\"No se recibieron ítems para generar el resumen.\");\n}\n\n// Generar el HTML completo y adjuntarlo al primer ítem\nfirstItem.json.final_email_html = generateAnalysisSummaryHtml(items);\n\n// Solo retornamos el primer ítem, ya que contiene el HTML completo para el correo.\nreturn [firstItem];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3760,
+        1200
+      ],
+      "id": "bf1a5b0f-c387-43be-b20a-874837fe93c9",
+      "name": "Final Email"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "[VEREDICTO_TEXTO]",
+              "replaceText": "={{ $('Code in JavaScript').item.json.VEREDICTO_TEXTO }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "[CONCLUSION]",
+              "replaceText": "={{ $('Code in JavaScript').item.json.CONCLUSION }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "=[COMPARATIVA]",
+              "replaceText": "={{ $('Code in JavaScript').item.json.COMPARATIVA }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "[SUGERENCIAS]",
+              "replaceText": "={{ $('Code in JavaScript').item.json.SUGERENCIAS }}",
+              "matchCase": true
+            },
+            {
+              "action": "replaceAll",
+              "text": "[Empresa]",
+              "replaceText": "={{ $('Indeed Jobs Sheet (GET)').item.json[\"Company Name\"] }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "[Cargo]",
+              "replaceText": "={{ $('Indeed Jobs Sheet (GET)').item.json[\"Position Name\"] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        4720,
+        1568
+      ],
+      "id": "bceb78c9-5d65-4255-a49b-53e526ec927c",
+      "name": "Insert Text For Analyses",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders').item.json.id }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1202194973,
+          "mode": "list",
+          "cachedResultName": "Indeed Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GQ_iVPqGOrenNZaMcpIkCv9efRuzj4kb6nfQa_srebs/edit#gid=1202194973"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Position Name",
+              "lookupValue": "={{ $json['Position Name'] }}"
+            },
+            {
+              "lookupColumn": "Analysis",
+              "lookupValue": "={{ $json.Analysis }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4800,
+        1760
+      ],
+      "id": "4d9366d2-9511-450b-8eeb-5d1ea9255507",
+      "name": "Get Indeed Jobs Row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "paQ9mTdJ9l2YVFu4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# 📝Processing Jobs",
+        "height": 384,
+        "width": 4752,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -368,
+        736
+      ],
+      "typeVersion": 1,
+      "id": "cf6686ff-b682-41d7-b620-09e805513391",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# 📝AI Assistant",
+        "height": 784,
+        "width": 1744,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3232,
+        1184
+      ],
+      "typeVersion": 1,
+      "id": "b1fc06d6-01a6-41af-b95c-cbc4f3fe564c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# 📝AI Assistant (ALTERNATIVE)\n\n## ⚠️ Alto consumo de solicitudes máximas por minuto (Aproximadamente 6 - 8 de un máximo de 10) - Gemini flash 2.5",
+        "height": 608,
+        "width": 1344,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        1264
+      ],
+      "typeVersion": 1,
+      "id": "96aa719e-085f-4f9d-82ba-7e4228ae2363",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "actorId": {
+          "__rl": true,
+          "value": "hMvNSpz3JnHgl5jkh",
+          "mode": "list",
+          "cachedResultName": "Indeed Scraper (misceres/indeed-scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/hMvNSpz3JnHgl5jkh/input"
+        },
+        "customBody": "={\n    \"country\": \"{{ $json.country }}\",\n    \"followApplyRedirects\": false,\n    \"maxItems\": {{ $json['Number of Jobs'] }},\n    \"parseCompanyDetails\": true,\n    \"position\": \"{{ $json.Keywords }}\",\n    \"saveOnlyUniqueItems\": true\n}",
+        "timeout": {}
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        992,
+        928
+      ],
+      "id": "d64ea10d-0489-4903-951a-30e8a5898d7f",
+      "name": "Search Jobs",
+      "executeOnce": true,
+      "credentials": {
+        "apifyApi": {
+          "id": "Fy79u2f3bRzKEGHs",
+          "name": "Apify account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "Datasets",
+        "datasetId": "={{ $json.defaultDatasetId }}",
+        "offset": {}
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        928
+      ],
+      "id": "9ea4c01a-ffc9-43a4-abf6-558f3b1f633b",
+      "name": "Get Jobs items",
+      "credentials": {
+        "apifyApi": {
+          "id": "Fy79u2f3bRzKEGHs",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=Análisis-{{ $now.format('yyyy-MM-dd') }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu clave de acceso\"] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4192,
+        752
+      ],
+      "id": "f938c7f8-1ff9-44f0-ba28-d2385f38aced",
+      "name": "Create folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "08ca62e0-7f9d-4056-8d9b-fc2083e4b713",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "=Análisis-{{ $now.format('yyyy-MM-dd') }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3840,
+        768
+      ],
+      "id": "7e01da10-2792-4004-8081-7e8137ba4ca4",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "Análisis",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu clave de acceso\"] }}",
+            "mode": "id"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3456,
+        768
+      ],
+      "id": "e5ffe23a-dd9c-40b8-bcd3-9841d18264b8",
+      "name": "Search files and folders2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=Análisis-{{ $now.format('yyyy-MM-dd') }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu clave de acceso\"] }}",
+            "mode": "id"
+          },
+          "whatToSearch": "folders",
+          "includeTrashed": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4304,
+        1760
+      ],
+      "id": "d1f16917-8ad7-4863-b6c7-07115a86a627",
+      "name": "Search files and folders3",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Copy Analyses Format').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4480,
+        1760
+      ],
+      "id": "e008d3f8-679e-4641-8924-9b2ab1c548ed",
+      "name": "Move file1",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "x05Gb0mHR54rODlO",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4016,
+        928
+      ],
+      "id": "7e508b92-11a5-45a2-93ae-e494b7e64f29",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        4032,
+        752
+      ],
+      "id": "e6041f9c-e18c-4a8c-8059-269aa184ab56",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        3552,
+        1200
+      ],
+      "id": "e4200238-1d88-4773-9e0a-741c420540c2",
+      "name": "Remove Duplicates1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        3664,
+        768
+      ],
+      "id": "52176ca0-68b8-4e64-9309-80116c32e4d2",
+      "name": "Remove Duplicates2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        3552,
+        1344
+      ],
+      "id": "313ccd7f-6bfd-4e4a-8248-d6e0cc63b9ec",
+      "name": "Remove Duplicates3"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "['Position Name'], ['Company Name'], ['Company Description']",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        768
+      ],
+      "id": "3db2df84-9892-415a-b633-147e0d171034",
+      "name": "Remove Duplicates4"
+    },
+    {
+      "parameters": {
+        "resource": "Actor runs",
+        "operation": "Get run",
+        "runId": {
+          "__rl": true,
+          "value": "oSpVvMSUhxVRbBXt8",
+          "mode": "list",
+          "cachedResultName": "Thu Nov 20 2025 4:07:46 PM - SUCCEEDED",
+          "cachedResultUrl": "https://console.apify.com/runs/oSpVvMSUhxVRbBXt8"
+        }
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        928
+      ],
+      "id": "7028f694-35c9-43cf-b4bd-9f893aba6269",
+      "name": "Get runs",
+      "credentials": {
+        "apifyApi": {
+          "id": "Fy79u2f3bRzKEGHs",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function formatJobDate(item) {\n    const data = item.json;\n    const dateKey = 'postingDateParsed'; // Fecha de publicación ISO\n\n    // 1. Verificar si la propiedad existe y es una cadena\n    if (data[dateKey] && typeof data[dateKey] === 'string') {\n        // 2. Crear un objeto Date a partir de la cadena ISO (Fecha de la Oferta)\n        const dateObj = new Date(data[dateKey]);\n        \n        // 3. Crear el objeto Date para HOY (medianoche de hoy en UTC para una comparación limpia)\n        const today = new Date();\n        // Reseteamos las horas, minutos, segundos y milisegundos de hoy.\n        // Usamos setUTCFullYear/Month/Date para comparaciones basadas en día UTC si la fecha original es UTC (tiene 'Z').\n        const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));\n\n\n        // 4. Verificar si la fecha de la oferta es válida\n        if (!isNaN(dateObj)) {\n            \n            // --- CÁLCULO DE DÍAS TRANSCURRIDOS ---\n            \n            // Convertir ambas fechas a medianoche (UTC) para asegurar que el cálculo sea solo de días completos.\n            // Creamos un punto de inicio de la fecha de la oferta (medianoche).\n            const jobDateUTC = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));\n            \n            // La diferencia se calcula en milisegundos\n            const timeDifference = todayUTC.getTime() - jobDateUTC.getTime();\n            \n            // Convertir milisegundos a días (1000ms * 60s * 60m * 24h)\n            const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));\n\n            \n            // --- GENERACIÓN DE TEXTO \"Posted Day\" ---\n            \n            let postedDayText;\n            if (daysDifference === 0) {\n                postedDayText = \"Recién publicado\";\n            } else if (daysDifference === 1) {\n                postedDayText = \"Publicado hace 1 día\";\n            } else if (daysDifference > 1) {\n                postedDayText = `Publicado hace ${daysDifference} días`;\n            } else {\n                // Caso futuro o fecha mal ingresada (ej., Publicado hace -5 días)\n                postedDayText = \"Fecha inválida o futura\";\n            }\n            \n            // 5. Asignar las nuevas propiedades al ítem\n            data['postingDayText'] = postedDayText; // Nuevo campo para la columna 'Posted Day'\n            \n            // --- CÓDIGO ORIGINAL PARA EL FORMATO DE FECHA (dd-MM-yyyy) ---\n            const year = dateObj.getUTCFullYear();\n            const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0'); \n            const day = String(dateObj.getUTCDate()).padStart(2, '0');\n            const formattedDate = `${year}-${month}-${day}`;\n            data['postingDateFormatted'] = formattedDate;\n\n        } else {\n            data['postingDateFormatted'] = 'Fecha Inválida';\n            data['postingDayText'] = 'Fecha Inválida';\n        }\n    } else {\n        data['postingDateFormatted'] = 'No Disponible';\n        data['postingDayText'] = 'No Disponible';\n    }\n\n    return item;\n}\n\n// ----------------------------------------------------------------------\n// Lógica de Ejecución (Punto de entrada de n8n)\n// ----------------------------------------------------------------------\n\nconst processedItems = [];\n\n// Recorrer todos los ítems que llegan al nodo \nfor (const item of items) {\n    processedItems.push(formatJobDate(item));\n}\n\nreturn processedItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        928
+      ],
+      "id": "201c6b1e-89c0-4044-9279-f6acb31646a7",
+      "name": "DateProcessor",
+      "notes": "Convertir la fecha ISO a formato dd-MM-yyyy y calcular los días transcurridos hasta hoy"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9ed696e1-76f6-47a5-8f45-dd4c29f0bc68",
+              "name": "Posted At",
+              "value": "={{ $json.postingDateFormatted }}",
+              "type": "string"
+            },
+            {
+              "id": "829227a1-36eb-436e-8e7b-68ad0e7886aa",
+              "name": "Posted Days",
+              "value": "={{ $json.postingDayText }}",
+              "type": "string"
+            },
+            {
+              "id": "97c63e8c-d004-4aca-95bf-dc4a25bab489",
+              "name": "Position Name",
+              "value": "={{ $json.positionName }}",
+              "type": "string"
+            },
+            {
+              "id": "e47f7a7c-31ff-4fee-9a91-9e7c17977c11",
+              "name": "Company Name",
+              "value": "={{ $json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "6f2b7182-2b18-4d4b-baef-5d28d721605d",
+              "name": "Location",
+              "value": "={{ $json.location }}",
+              "type": "string"
+            },
+            {
+              "id": "01b5381f-a098-4435-98ec-17889776ec69",
+              "name": "Company Description",
+              "value": "={{ $json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "647ebdcc-905e-498b-ad06-796b718790a2",
+              "name": "Job Type",
+              "value": "={{ $json.jobType }}",
+              "type": "string"
+            },
+            {
+              "id": "8bdbbaf2-cd8b-4b51-bd54-b08c34b20768",
+              "name": "Salary",
+              "value": "={{ $json.salary }}",
+              "type": "string"
+            },
+            {
+              "id": "090dc3dd-1766-4d55-a30a-edc029336b74",
+              "name": "Indeed link",
+              "value": "={{ $json.companyInfo.indeedUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "d46aa938-39f6-43c1-8838-e5e5daf212d5",
+              "name": "Company Website",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "ece69c7a-c318-4032-9d4b-fef6f10dac9f",
+              "name": "Analysis",
+              "value": "NO",
+              "type": "string"
+            },
+            {
+              "id": "faf681d4-6f85-41da-94e1-245c6a5c2df7",
+              "name": "Veredict",
+              "value": "NO",
+              "type": "string"
+            },
+            {
+              "id": "6d59b52a-0a72-4198-85d0-eed0ba168aa7",
+              "name": "Analysis URL",
+              "value": "NO",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1664,
+        928
+      ],
+      "id": "392e10bd-a3e3-42e5-aec7-ac5ac76675d2",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1202194973,
+          "mode": "list",
+          "cachedResultName": "Indeed Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GQ_iVPqGOrenNZaMcpIkCv9efRuzj4kb6nfQa_srebs/edit#gid=1202194973"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Position Name",
+              "lookupValue": "={{ $json['Position Name'] }}"
+            },
+            {
+              "lookupColumn": "Company Name",
+              "lookupValue": "={{ $json['Company Name'] }}"
+            },
+            {
+              "lookupColumn": "Company Description",
+              "lookupValue": "={{ $json['Company Description'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2224,
+        768
+      ],
+      "id": "e8a9559e-d7b1-4f1d-9f10-43ed0030f71e",
+      "name": "Indeed Jobs Sheet (GET)1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "paQ9mTdJ9l2YVFu4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "828d3daa-c4d2-4f98-aa46-b7808ae46ba7",
+              "leftValue": "={{ $json['Position Name'] }}",
+              "rightValue": "={{ $('Remove Duplicates4').item.json['Position Name'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "1bab6fd1-cab4-4ee2-b701-3686dcf6b25d",
+              "leftValue": "={{ $json['Company Name'] }}",
+              "rightValue": "={{ $('Remove Duplicates4').item.json['Company Name'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "f50c7bae-20b1-40af-bc85-f05d84460d98",
+              "leftValue": "={{ $json['Company Description'] }}",
+              "rightValue": "={{ $('Remove Duplicates4').item.json['Company Description'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2432,
+        768
+      ],
+      "id": "83eb65a3-a2c9-4a1d-b313-36505889b149",
+      "name": "If3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        592
+      ],
+      "id": "6f54b6b3-3fcc-4578-b5bb-a6326aa7e305",
+      "name": "No Operation, do nothing3"
+    }
+  ],
+  "pinData": {
+    "Login": [
+      {
+        "json": {
+          "Ingresa tu email": "zaizor.black@gmail.com",
+          "Ingresa tu clave de acceso": "1V6P0wJS6HdA-rJhsb-kdR0wXP4iGlJsq",
+          "submittedAt": "2025-11-17T14:57:30.870-05:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "If Jobs exists": {
+      "main": [
+        [
+          {
+            "node": "Indeed Jobs Sheet (GET)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Create Analysis Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Indeed Jobs Sheet (GET)": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Search files and folders2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Indeed Jobs Sheet (SET)": {
+      "main": [
+        [
+          {
+            "node": "If Jobs exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Remove Duplicates3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Analysis Doc": {
+      "main": [
+        [
+          {
+            "node": "Update Analysis Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Analysis Doc": {
+      "main": [
+        [
+          {
+            "node": "Move file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Indeed Jobs Sheet": {
+      "main": [
+        [
+          {
+            "node": "Get Indeed Jobs Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CV": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files name CV": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jobs Keyword": {
+      "main": [
+        [
+          {
+            "node": "Search Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Jobs Keyword",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text": {
+      "main": [
+        [
+          {
+            "node": "Format Cleaner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Cleaner": {
+      "main": [
+        [
+          {
+            "node": "Choose Branch 2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Create User Folder": {
+      "main": [
+        [
+          {
+            "node": "Copy (Original) Jobs Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move CV Doc": {
+      "main": [
+        [
+          {
+            "node": "Move Jobs Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create CV Doc": {
+      "main": [
+        [
+          {
+            "node": "Update CV Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update CV Doc": {
+      "main": [
+        [
+          {
+            "node": "Create User Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy (Original) Jobs Sheet": {
+      "main": [
+        [
+          {
+            "node": "Move CV Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Jobs Sheet": {
+      "main": [
+        [
+          {
+            "node": "Keywords (SET)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keywords (SET)": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "ID Access Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Send Final Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proccessing Data Form": {
+      "main": [
+        [
+          {
+            "node": "Extract Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Check Files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search User Files": {
+      "main": [
+        [
+          {
+            "node": "User Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Choose Branch 2": {
+      "main": [
+        [
+          {
+            "node": "Create CV Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ID Access Form": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Validation": {
+      "main": [
+        [
+          {
+            "node": "Redirect Already Registers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Choose Branch 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register Or Not": {
+      "main": [
+        [
+          {
+            "node": "Register",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Login": {
+      "main": [
+        [
+          {
+            "node": "Register Or Not",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register": {
+      "main": [
+        [
+          {
+            "node": "Proccessing Data Form",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Search User Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Files and folders": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy Format": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Format": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Format": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders1": {
+      "main": [
+        [
+          {
+            "node": "Get a document1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document1": {
+      "main": [
+        [
+          {
+            "node": "Coach experto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Validation Sections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coach experto": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validation Sections": {
+      "main": [
+        [
+          {
+            "node": "Get Analyses Format",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Coach experto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy Analyses Format": {
+      "main": [
+        [
+          {
+            "node": "Insert Text For Analyses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Analyses Format": {
+      "main": [
+        [
+          {
+            "node": "Copy Analyses Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Final Email": {
+      "main": [
+        [
+          {
+            "node": "Completion Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Email": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Text For Analyses": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Indeed Jobs Row": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Jobs": {
+      "main": [
+        [
+          {
+            "node": "Get runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Jobs items": {
+      "main": [
+        [
+          {
+            "node": "DateProcessor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder": {
+      "main": [
+        []
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders2": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders3": {
+      "main": [
+        [
+          {
+            "node": "Move file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move file1": {
+      "main": [
+        [
+          {
+            "node": "Update Indeed Jobs Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Create folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates1": {
+      "main": [
+        [
+          {
+            "node": "Final Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates3": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates4": {
+      "main": [
+        [
+          {
+            "node": "Indeed Jobs Sheet (GET)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get runs": {
+      "main": [
+        [
+          {
+            "node": "Get Jobs items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DateProcessor": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Indeed Jobs Sheet (GET)1": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Indeed Jobs Sheet (SET)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8a393b3b-dcfe-4901-9b2c-760c426850aa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c9679bb0ef3e09745ced1e7ef2b596744bbd4242cd22d4ea9d3fed4a688906b3"
+  },
+  "id": "mkcGttHR8ghxTJfD",
+  "tags": []
+}
