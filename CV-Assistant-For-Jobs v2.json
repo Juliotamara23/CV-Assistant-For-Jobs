@@ -6,7 +6,7 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        2688,
+        2896,
         928
       ],
       "id": "2825606d-797a-4e54-b1ee-8bf052c0bcce",
@@ -69,7 +69,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2560,
+        2768,
         784
       ],
       "id": "04a44506-fe85-4303-b68d-945692be4c7c",
@@ -152,7 +152,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        2768,
+        2976,
         768
       ],
       "id": "e5057939-6df6-4f1a-b3aa-81e59fe9e345",
@@ -328,7 +328,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        2368,
+        2576,
         784
       ],
       "id": "df18c381-878e-4251-b261-bf7035fedbea",
@@ -349,7 +349,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        3120,
+        3328,
         1296
       ],
       "id": "515bd973-bf06-4a6a-b204-40ca23996948",
@@ -584,7 +584,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        4848,
+        5056,
         1792
       ],
       "id": "4685b19c-ba9c-43a4-b6d4-7e8ba53dd61a",
@@ -758,7 +758,8 @@
         784
       ],
       "id": "eeada2ce-07c3-44fc-8028-910c729ce8a9",
-      "name": "Merge"
+      "name": "Merge",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -1046,7 +1047,7 @@
       "type": "n8n-nodes-base.html",
       "typeVersion": 1.2,
       "position": [
-        1056,
+        1072,
         464
       ],
       "id": "305c848f-a52d-434c-a8a5-d61579d52784",
@@ -1122,7 +1123,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2928,
+        3136,
         960
       ],
       "id": "9b9adeb7-9ffb-4377-b28a-588a5a78cf32",
@@ -1133,7 +1134,7 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        3152,
+        3360,
         944
       ],
       "id": "cfc52dcb-4b29-464a-a723-c5b981667c86",
@@ -1144,7 +1145,7 @@
       "type": "n8n-nodes-base.limit",
       "typeVersion": 1,
       "position": [
-        3776,
+        3984,
         1232
       ],
       "id": "cbd8fa81-f887-4076-bab9-59e0fe3228c9",
@@ -1613,7 +1614,7 @@
     {
       "parameters": {
         "content": "# 📝Register Section ",
-        "height": 640,
+        "height": 656,
         "width": 1600
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -1651,7 +1652,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        4048,
+        4256,
         1392
       ],
       "id": "0231e4e2-6d6b-4743-b642-aa22205fd852",
@@ -1691,7 +1692,7 @@
       "type": "n8n-nodes-base.form",
       "typeVersion": 2.3,
       "position": [
-        4176,
+        4384,
         1232
       ],
       "id": "f874e4be-a5ce-476c-b3bd-62c1d6a8252f",
@@ -1723,7 +1724,7 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        4720,
+        4928,
         1600
       ],
       "id": "9181facb-a53d-4628-bd44-5092fe0337bd",
@@ -1744,7 +1745,7 @@
       "type": "n8n-nodes-base.googleDocs",
       "typeVersion": 2,
       "position": [
-        4512,
+        4720,
         1600
       ],
       "id": "2bd0bfc8-8bb4-49d7-a644-1190a950dbb6",
@@ -1767,7 +1768,7 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        3968,
+        4176,
         1232
       ],
       "id": "78e2a926-b37b-417e-8e41-ca97ccc26d23",
@@ -1787,7 +1788,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3568,
+        3776,
         1232
       ],
       "id": "bf1a5b0f-c387-43be-b20a-874837fe93c9",
@@ -1839,7 +1840,7 @@
       "type": "n8n-nodes-base.googleDocs",
       "typeVersion": 2,
       "position": [
-        4928,
+        5136,
         1600
       ],
       "id": "bceb78c9-5d65-4255-a49b-53e526ec927c",
@@ -1883,7 +1884,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        5024,
+        5232,
         1792
       ],
       "id": "4d9366d2-9511-450b-8eeb-5d1ea9255507",
@@ -1953,7 +1954,8 @@
           "cachedResultName": "Indeed Scraper (misceres/indeed-scraper)",
           "cachedResultUrl": "https://console.apify.com/actors/hMvNSpz3JnHgl5jkh/input"
         },
-        "customBody": "={\n    \"country\": \"{{ $json.country }}\",\n    \"followApplyRedirects\": false,\n    \"maxItems\": {{ $json['Number of Jobs'] }},\n    \"parseCompanyDetails\": true,\n    \"position\": \"{{ $json.Keywords }}\",\n    \"saveOnlyUniqueItems\": true\n}"
+        "customBody": "={\n    \"country\": \"{{ $json.country }}\",\n    \"followApplyRedirects\": false,\n    \"maxItems\": {{ $json['Number of Jobs'] }},\n    \"parseCompanyDetails\": true,\n    \"position\": \"{{ $json.Keywords }}\",\n    \"saveOnlyUniqueItems\": true\n}",
+        "timeout": {}
       },
       "type": "@apify/n8n-nodes-apify.apify",
       "typeVersion": 1,
@@ -1970,7 +1972,8 @@
           "id": "Fy79u2f3bRzKEGHs",
           "name": "Apify account"
         }
-      }
+      },
+      "disabled": true
     },
     {
       "parameters": {
@@ -2012,7 +2015,7 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        3776,
+        3984,
         752
       ],
       "id": "f938c7f8-1ff9-44f0-ba28-d2385f38aced",
@@ -2051,7 +2054,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        3424,
+        3632,
         768
       ],
       "id": "7e01da10-2792-4004-8081-7e8137ba4ca4",
@@ -2073,7 +2076,7 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        3024,
+        3232,
         768
       ],
       "id": "e5ffe23a-dd9c-40b8-bcd3-9841d18264b8",
@@ -2092,7 +2095,7 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        3616,
+        3824,
         912
       ],
       "id": "7e508b92-11a5-45a2-93ae-e494b7e64f29",
@@ -2103,7 +2106,7 @@
       "type": "n8n-nodes-base.limit",
       "typeVersion": 1,
       "position": [
-        3616,
+        3824,
         752
       ],
       "id": "e6041f9c-e18c-4a8c-8059-269aa184ab56",
@@ -2116,7 +2119,7 @@
       "type": "n8n-nodes-base.removeDuplicates",
       "typeVersion": 2,
       "position": [
-        3360,
+        3568,
         1232
       ],
       "id": "e4200238-1d88-4773-9e0a-741c420540c2",
@@ -2129,7 +2132,7 @@
       "type": "n8n-nodes-base.removeDuplicates",
       "typeVersion": 2,
       "position": [
-        3232,
+        3440,
         768
       ],
       "id": "52176ca0-68b8-4e64-9309-80116c32e4d2",
@@ -2142,7 +2145,7 @@
       "type": "n8n-nodes-base.removeDuplicates",
       "typeVersion": 2,
       "position": [
-        3360,
+        3568,
         1408
       ],
       "id": "313ccd7f-6bfd-4e4a-8248-d6e0cc63b9ec",
@@ -2154,10 +2157,10 @@
         "operation": "Get run",
         "runId": {
           "__rl": true,
-          "value": "rIt1o4FGemJE6xLtP",
+          "value": "bgBlYfFoAVb0WnEh0",
           "mode": "list",
-          "cachedResultName": "Tue Dec 02 2025 11:09:49 AM - SUCCEEDED",
-          "cachedResultUrl": "https://console.apify.com/runs/rIt1o4FGemJE6xLtP"
+          "cachedResultName": "Wed Dec 03 2025 2:36:21 PM - SUCCEEDED",
+          "cachedResultUrl": "https://console.apify.com/runs/bgBlYfFoAVb0WnEh0"
         }
       },
       "type": "@apify/n8n-nodes-apify.apify",
@@ -2174,7 +2177,6 @@
           "name": "Apify account"
         }
       },
-      "disabled": true,
       "notes": "Testing node to not spent credit for Indeed Job Scrapper."
     },
     {
@@ -2314,7 +2316,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        3888,
+        4096,
         1408
       ],
       "id": "22708655-7a00-4232-875c-24024fde66e3",
@@ -2328,7 +2330,7 @@
       "type": "n8n-nodes-base.googleDocs",
       "typeVersion": 2,
       "position": [
-        3744,
+        3952,
         1408
       ],
       "id": "18c6c4fb-3e9c-4a6b-b81f-0cb4b972a7cb",
@@ -2364,7 +2366,7 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        3552,
+        3760,
         1408
       ],
       "id": "0c349206-6115-400d-b20c-ecc46f0e8313",
@@ -2384,7 +2386,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4336,
+        4544,
         1392
       ],
       "id": "5804e3b3-301c-4981-b39e-e5ae66d8677b",
@@ -2408,7 +2410,7 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        4512,
+        4720,
         1792
       ],
       "id": "d1f16917-8ad7-4863-b6c7-07115a86a627",
@@ -2443,7 +2445,7 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        4672,
+        4880,
         1792
       ],
       "id": "e008d3f8-679e-4641-8924-9b2ab1c548ed",
@@ -2514,7 +2516,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        4304,
+        4512,
         1616
       ],
       "id": "747c005e-3c0a-463a-99bb-5bf57d8c1924",
@@ -2529,8 +2531,8 @@
       "type": "n8n-nodes-base.removeDuplicates",
       "typeVersion": 2,
       "position": [
-        2160,
-        784
+        2352,
+        928
       ],
       "id": "6a3c80d3-06e5-45d6-8f38-1641e49e471a",
       "name": "Remove Duplicates"
@@ -2582,6 +2584,57 @@
       ],
       "id": "aa7889b6-e300-4989-bb42-59b8a9b1163f",
       "name": "DuplicateFilter"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "409277ef-5689-4708-a5fa-6d45c0066ca4",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2144,
+        784
+      ],
+      "id": "3e48b80e-aa52-47f1-be08-1c8b69d28e17",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "No tienes ofertas nuevas por el día de hoy 🤷‍♂️",
+        "completionMessage": "Al parecer ya tienes todos los trabajos analizados por hoy, puedes intentarlo mas tarde.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        2352,
+        768
+      ],
+      "id": "fe348bad-3b98-448a-a867-2a0c755c1b6d",
+      "name": "Nothing To Do",
+      "webhookId": "8e32e8b7-bb98-4044-8bd6-8c838f679ed7"
     }
   ],
   "pinData": {
@@ -2762,7 +2815,7 @@
       "main": [
         [
           {
-            "node": "Remove Duplicates",
+            "node": "If4",
             "type": "main",
             "index": 0
           }
@@ -3432,13 +3485,31 @@
           }
         ]
       ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Nothing To Do",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "bd2ac53e-eed3-4d4c-9f04-6c624cd12af0",
+  "versionId": "0c9fb81f-deaa-4326-85ac-61f24a8a606c",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "c9679bb0ef3e09745ced1e7ef2b596744bbd4242cd22d4ea9d3fed4a688906b3"
