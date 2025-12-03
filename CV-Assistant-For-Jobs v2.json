@@ -2246,7 +2246,7 @@
             {
               "id": "090dc3dd-1766-4d55-a30a-edc029336b74",
               "name": "Indeed link",
-              "value": "={{ $json.companyInfo.indeedUrl }}",
+              "value": "={{ $json.url }}",
               "type": "string"
             },
             {
@@ -3438,7 +3438,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "a0088617-6adf-4d48-8ead-6c8fb7db86e3",
+  "versionId": "bd2ac53e-eed3-4d4c-9f04-6c624cd12af0",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "c9679bb0ef3e09745ced1e7ef2b596744bbd4242cd22d4ea9d3fed4a688906b3"
