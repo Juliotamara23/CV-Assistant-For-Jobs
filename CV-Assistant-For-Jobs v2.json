@@ -6,8 +6,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        3136,
-        960
+        2688,
+        928
       ],
       "id": "2825606d-797a-4e54-b1ee-8bf052c0bcce",
       "name": "No Operation, do nothing"
@@ -51,6 +51,15 @@
                 "operation": "exists",
                 "singleValue": true
               }
+            },
+            {
+              "id": "13b0bbe8-0b00-4cd6-ae9e-767205536e6a",
+              "leftValue": "={{ $json.Analysis }}",
+              "rightValue": "DONE",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
             }
           ],
           "combinator": "and"
@@ -60,7 +69,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2832,
+        2560,
         784
       ],
       "id": "04a44506-fe85-4303-b68d-945692be4c7c",
@@ -90,8 +99,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        1072,
-        1456
+        3376,
+        2256
       ],
       "id": "5dcdce6d-1b1d-4769-93af-ef1a164b5241",
       "name": "Message a model",
@@ -131,6 +140,10 @@
             {
               "lookupColumn": "Company Name",
               "lookupValue": "={{ $json['Company Name'] }}"
+            },
+            {
+              "lookupColumn": "Analysis",
+              "lookupValue": "={{ $json.Analysis }}"
             }
           ]
         },
@@ -139,11 +152,12 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        3120,
+        2768,
         768
       ],
       "id": "e5057939-6df6-4f1a-b3aa-81e59fe9e345",
       "name": "Indeed Jobs Sheet (GET)",
+      "retryOnFail": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "paQ9mTdJ9l2YVFu4",
@@ -169,15 +183,17 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "Posted At": "={{ $json['Posted At'] }}",
-            "Company Description": "={{ $json['Company Description'] }}",
-            "Position Name": "={{ $json['Position Name'] }}",
-            "Company Name": "={{ $json['Company Name'] }}",
-            "Location": "={{ $json.Location }}",
-            "Job Type": "={{ $json['Job Type'] }}",
-            "Salary": "={{ $json.Salary }}",
-            "Indeed link": "={{ $json['Indeed link'] }}",
-            "Posted Days": "={{ $json['Posted Days'] }}"
+            "Posted At": "={{ $('Remove Duplicates').item.json['Posted At'] }}",
+            "Company Description": "={{ $('Remove Duplicates').item.json['Company Description'] }}",
+            "Position Name": "={{ $('Remove Duplicates').item.json['Position Name'] }}",
+            "Company Name": "={{ $('Remove Duplicates').item.json['Company Name'] }}",
+            "Location": "={{ $('Remove Duplicates').item.json.Location }}",
+            "Job Type": "={{ $('Remove Duplicates').item.json['Job Type'] }}",
+            "Salary": "={{ $('Remove Duplicates').item.json.Salary }}",
+            "Posted Days": "=",
+            "Indeed link": "={{ $('Remove Duplicates').item.json['Indeed link'] }}",
+            "Company Website": "={{ $('Remove Duplicates').item.json['Company Website'] }}",
+            "Analysis": "={{ $json.Analysis }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -271,7 +287,7 @@
               "display": true,
               "type": "string",
               "canBeUsedToMatch": true,
-              "removed": true
+              "removed": false
             },
             {
               "id": "Analysis",
@@ -281,7 +297,7 @@
               "display": true,
               "type": "string",
               "canBeUsedToMatch": true,
-              "removed": true
+              "removed": false
             },
             {
               "id": "Veredict",
@@ -312,12 +328,13 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        2640,
+        2368,
         784
       ],
       "id": "df18c381-878e-4251-b261-bf7035fedbea",
       "name": "Indeed Jobs Sheet (SET)",
       "alwaysOutputData": false,
+      "retryOnFail": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "paQ9mTdJ9l2YVFu4",
@@ -332,8 +349,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        3312,
-        1264
+        3120,
+        1296
       ],
       "id": "515bd973-bf06-4a6a-b204-40ca23996948",
       "name": "Loop Over Items"
@@ -346,8 +363,8 @@
       "type": "n8n-nodes-base.googleDocs",
       "typeVersion": 2,
       "position": [
-        1584,
-        1456
+        3888,
+        2256
       ],
       "id": "2c0561a1-d0f0-4135-81b7-917c955aee8e",
       "name": "Create Analysis Doc",
@@ -375,8 +392,8 @@
       "type": "n8n-nodes-base.googleDocs",
       "typeVersion": 2,
       "position": [
-        1808,
-        1456
+        4112,
+        2256
       ],
       "id": "f449b2ad-28fc-4797-9752-24c16dc5baef",
       "name": "Update Analysis Doc",
@@ -408,7 +425,7 @@
           "mappingMode": "defineBelow",
           "value": {
             "row_number": 0,
-            "Veredict": "={{ $('Code in JavaScript').item.json.VEREDICTO_TEXTO }}",
+            "Veredict": "={{ $('Section Matcher').item.json.VEREDICTO_TEXTO }}",
             "Analysis URL": "=https://docs.google.com/document/d/{{ $('Copy Analyses Format').item.json.id }}",
             "Analysis": "DONE",
             "Position Name": "={{ $('Indeed Jobs Sheet (GET)').item.json[\"Position Name\"] }}"
@@ -567,11 +584,12 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        4656,
-        1760
+        4848,
+        1792
       ],
       "id": "4685b19c-ba9c-43a4-b6d4-7e8ba53dd61a",
       "name": "Update Indeed Jobs Sheet",
+      "retryOnFail": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "paQ9mTdJ9l2YVFu4",
@@ -603,14 +621,14 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        1616,
-        1664
+        3920,
+        2464
       ],
       "id": "4da5c4c4-b50e-4605-b846-421720e58b5c",
       "name": "Move file",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       },
@@ -625,8 +643,8 @@
       "type": "n8n-nodes-base.googleDocsTool",
       "typeVersion": 2,
       "position": [
-        1056,
-        1648
+        3360,
+        2448
       ],
       "id": "f51fe080-f6fb-405d-95ee-1e3a7bea046e",
       "name": "CV",
@@ -656,14 +674,14 @@
       "type": "n8n-nodes-base.googleDriveTool",
       "typeVersion": 3,
       "position": [
-        928,
-        1600
+        3232,
+        2400
       ],
       "id": "e746235f-8cbc-4385-8b3c-1fc07a4025dc",
       "name": "Search files name CV",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -685,8 +703,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        832,
-        928
+        800,
+        1008
       ],
       "id": "97503d9d-d8ae-4fc7-ba9c-ce8e0d39f7c6",
       "name": "Jobs Keyword",
@@ -715,14 +733,14 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        592,
+        624,
         768
       ],
       "id": "7840cec0-6913-4739-8467-0134b5f2ff46",
       "name": "Search files and folders",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -736,8 +754,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        1808,
-        768
+        1984,
+        784
       ],
       "id": "eeada2ce-07c3-44fc-8028-910c729ce8a9",
       "name": "Merge"
@@ -796,7 +814,7 @@
       "name": "Create User Folder",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -832,7 +850,7 @@
       "name": "Move CV Doc",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -908,7 +926,7 @@
       "name": "Copy (Original) Jobs Sheet",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -944,7 +962,7 @@
       "name": "Move Jobs Sheet",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -1075,6 +1093,26 @@
                 "type": "string",
                 "operation": "equals"
               }
+            },
+            {
+              "id": "cdb0e18f-4009-45a5-959b-3fde62aabe03",
+              "leftValue": "={{ $json['Company Name'] }}",
+              "rightValue": "={{ $('Indeed Jobs Sheet (SET)').item.json[\"Position Name\"] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "f75fbb33-a863-42d8-9758-67983284d424",
+              "leftValue": "={{ $json[\"Company Description\"] }}",
+              "rightValue": "={{ $('Indeed Jobs Sheet (SET)').item.json[\"Company Description\"] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
             }
           ],
           "combinator": "and"
@@ -1084,7 +1122,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        3392,
+        2928,
         960
       ],
       "id": "9b9adeb7-9ffb-4377-b28a-588a5a78cf32",
@@ -1095,7 +1133,7 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        3600,
+        3152,
         944
       ],
       "id": "cfc52dcb-4b29-464a-a723-c5b981667c86",
@@ -1106,8 +1144,8 @@
       "type": "n8n-nodes-base.limit",
       "typeVersion": 1,
       "position": [
-        3968,
-        1200
+        3776,
+        1232
       ],
       "id": "cbd8fa81-f887-4076-bab9-59e0fe3228c9",
       "name": "Limit"
@@ -1160,7 +1198,7 @@
       "parameters": {
         "operation": "completion",
         "respondWith": "redirect",
-        "redirectUrl": "https://julio23.app.n8n.cloud/form/d55fdf38-430c-4947-961b-ed0013085655",
+        "redirectUrl": "http://localhost:5678/form-test/d55fdf38-430c-4947-961b-ed0013085655",
         "options": {}
       },
       "type": "n8n-nodes-base.form",
@@ -1238,7 +1276,7 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -1395,7 +1433,7 @@
     {
       "parameters": {
         "formTitle": "Login",
-        "formDescription": "Asistente de compatibilidad laboral y gestión de análisis",
+        "formDescription": "Asistente de compatibilidad laboral",
         "formFields": {
           "values": [
             {
@@ -1478,7 +1516,7 @@
       "name": "Check Files and folders",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -1508,14 +1546,14 @@
       "type": "n8n-nodes-base.googleDriveTool",
       "typeVersion": 3,
       "position": [
-        1312,
-        1648
+        3616,
+        2448
       ],
       "id": "e4e3ac66-869e-410c-afba-50c544528a3e",
       "name": "Copy Format",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -1529,8 +1567,8 @@
       "type": "n8n-nodes-base.googleDocsTool",
       "typeVersion": 2,
       "position": [
-        1184,
-        1648
+        3488,
+        2448
       ],
       "id": "8bb0b74c-f54d-4581-bf52-343aa4023513",
       "name": "Get Format",
@@ -1560,8 +1598,8 @@
       "type": "n8n-nodes-base.googleDocsTool",
       "typeVersion": 2,
       "position": [
-        1456,
-        1648
+        3760,
+        2448
       ],
       "id": "414451e8-8991-40db-943a-eb05c6b1e3ec",
       "name": "Update Format",
@@ -1571,76 +1609,6 @@
           "name": "Google Docs account"
         }
       }
-    },
-    {
-      "parameters": {
-        "resource": "fileFolder",
-        "queryString": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu email\"] }}",
-        "filter": {
-          "driveId": {
-            "mode": "list",
-            "value": "My Drive"
-          },
-          "folderId": {
-            "__rl": true,
-            "value": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu clave de acceso\"] }}",
-            "mode": "id"
-          },
-          "whatToSearch": "files",
-          "fileTypes": [
-            "application/vnd.google-apps.document"
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        3776,
-        1344
-      ],
-      "id": "0c349206-6115-400d-b20c-ecc46f0e8313",
-      "name": "Search files and folders1",
-      "retryOnFail": true,
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
-          "name": "Google Drive account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "get",
-        "documentURL": "={{ $json.id }}"
-      },
-      "type": "n8n-nodes-base.googleDocs",
-      "typeVersion": 2,
-      "position": [
-        3984,
-        1344
-      ],
-      "id": "18c6c4fb-3e9c-4a6b-b81f-0cb4b972a7cb",
-      "name": "Get a document1",
-      "credentials": {
-        "googleDocsOAuth2Api": {
-          "id": "mR1k1lJgFz3Uk3ju",
-          "name": "Google Docs account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const items = $input.all();\nconst result = items.map((item) => {\n    // Asume que el texto de la IA está en 'content.parts[0].text'\n    const text = item.json.content.parts[0].text;\n    const parsedSections = {};\n\n    // 1. Expresión regular para encontrar los bloques.\n    // Captura el marcador [SECTION] y el contenido subsiguiente hasta el próximo marcador.\n    // [\\s\\S]*? - Captura cualquier carácter, incluyendo saltos de línea, de forma no codiciosa.\n    // Usamos el flag 'g' para encontrar todas las coincidencias.\n    const regex = /\\[(\\w+)\\]([\\s\\S]*?)(?=\\[|$)/g; \n    \n    let match;\n\n    // 2. Iterar sobre todas las coincidencias encontradas\n    while ((match = regex.exec(text)) !== null) {\n        // match[1]: Contiene el nombre del marcador (ej., COMPARATIVA)\n        const sectionName = match[1].trim(); \n        \n        // match[2]: Contiene el contenido de la sección (con el \\n inicial)\n        let sectionContent = match[2];\n        \n        // 3. Limpieza: Eliminar cualquier espacio o salto de línea al inicio\n        // que pudiera haber quedado justo después del corchete de apertura.\n        // Pero no el salto de línea de la primera línea de contenido.\n        // Por lo general, 'trim()' no es lo que queremos, pero aquí aseguramos limpiar \n        // solo el exceso de espacio/saltos de línea alrededor de la sección.\n        if (sectionContent) {\n            // El primer caracter después del marcador es el que queremos preservar\n            // No usamos trim() aquí para preservar el '\\n' inicial si existe.\n            sectionContent = sectionContent.trim();\n        }\n\n        // 4. Asignar el contenido a la propiedad correspondiente\n        parsedSections[sectionName] = sectionContent;\n    }\n\n    return { json: parsedSections, pairedItem: item.pairedItem };\n});\n\nreturn result;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3872,
-        1584
-      ],
-      "id": "5804e3b3-301c-4981-b39e-e5ae66d8677b",
-      "name": "Code in JavaScript"
     },
     {
       "parameters": {
@@ -1672,7 +1640,7 @@
               "role": "model"
             },
             {
-              "content": "=CV: {{ $json.content }}.\n\nLaboral Offer: {{ $('Indeed Jobs Sheet (GET)').item.json[\"Company Name\"] }}, {{ $('Indeed Jobs Sheet (GET)').item.json[\"Position Name\"] }}, \n{{ $('Indeed Jobs Sheet (GET)').item.json[\"Company Description\"] }}\n\nTu Tarea: Analiza el CV del usuario y la Oferta Laboral suministrada. Tu objetivo es determinar la compatibilidad del usuario para el puesto, evaluando cuidadosamente sus habilidades, experiencias, proyectos y formación académica en relación con los requisitos de la oferta.\n\nInstrucciones de Salida: Tu respuesta DEBE ser una única cadena de texto (string). Cada ítem de las secciones COMPARATIVA y SUGERENCIAS debe comenzar con el símbolo ● seguido de un espacio, cada item debe ir separado por un salto de línea (\\n).\n\nQue no debes hacer:\nNo uses JSON, Markdown ni HTML, incluir otro campo en la respuesta.\n\n[COMPARATIVA] Genera una lista de puntos, evaluando los requisitos de la oferta contra el CV. De la siguiente forma:\n\n● [Requisito cotra alineación.]\\n\n\n[Continúa la lista con todos los requisitos importantes, usando ● y \\n.]\n\n[SUGERENCIAS] Genera una lista de puntos. Ofreciendo sugerencias concretas para el candidato. De la siguiente forma:\n\n● [Sugerencia concreta.]\\n\n\n[Continúa la lista con todos las sugerencias,usando ● y \\n.]\n\n[VEREDICTO_TEXTO] Genera estrictamente solo la palabra \"APTO\" o \"NO APTO\".\n[veredicto]\n\n[CONCLUSION] Genera un resumen motivador y profesional que comience con: \"¡Excelente [nombre]! Encajas en esta oferta porque...\" o \"[nombre], no encajas directamente en esta oferta porque...\". No uses viñetas ni saltos de línea adicionales."
+              "content": "=CV: {{ $json.content }}.\n\nSi no encuentras la cv del usuario solo debes responder \"Lo siento pero no hay información en tu CV\"\n\nLaboral Offer: {{ $('Indeed Jobs Sheet (GET)').item.json[\"Company Name\"] }}, {{ $('Indeed Jobs Sheet (GET)').item.json[\"Position Name\"] }}, \n{{ $('Indeed Jobs Sheet (GET)').item.json[\"Company Description\"] }}\n\nTu Tarea: Analiza el CV del usuario y la Oferta Laboral suministrada. Tu objetivo es determinar la compatibilidad del usuario para el puesto, evaluando cuidadosamente sus habilidades, experiencias, proyectos y formación académica en relación con los requisitos de la oferta.\n\nInstrucciones de Salida: Tu respuesta DEBE ser una única cadena de texto (string). Cada ítem de las secciones COMPARATIVA y SUGERENCIAS debe comenzar con el símbolo ● seguido de un espacio, cada item debe ir separado por un salto de línea (\\n).\n\nQue no debes hacer:\nNo uses JSON, Markdown ni HTML, incluir otro campo en la respuesta.\n\n[COMPARATIVA] Genera una lista de puntos, evaluando los requisitos de la oferta contra el CV. De la siguiente forma:\n\n● [Requisito cotra alineación.]\\n\n\n[Continúa la lista con todos los requisitos importantes, usando ● y \\n.]\n\n[SUGERENCIAS] Genera una lista de puntos. Ofreciendo sugerencias concretas para el candidato. De la siguiente forma:\n\n● [Sugerencia concreta.]\\n\n\n[Continúa la lista con todos las sugerencias,usando ● y \\n.]\n\n[VEREDICTO_TEXTO] Genera estrictamente solo la palabra \"APTO\" o \"NO APTO\".\n[veredicto]\n\n[CONCLUSION] Genera un resumen motivador y profesional que comience con: \"¡Excelente [nombre]! Encajas en esta oferta porque...\" o \"[nombre], no encajas directamente en esta oferta porque...\". No uses viñetas ni saltos de línea adicionales."
             }
           ]
         },
@@ -1683,8 +1651,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        3584,
-        1584
+        4048,
+        1392
       ],
       "id": "0231e4e2-6d6b-4743-b642-aa22205fd852",
       "name": "Coach experto",
@@ -1723,76 +1691,12 @@
       "type": "n8n-nodes-base.form",
       "typeVersion": 2.3,
       "position": [
-        4368,
-        1200
+        4176,
+        1232
       ],
       "id": "f874e4be-a5ce-476c-b3bd-62c1d6a8252f",
       "name": "Completion Form",
       "webhookId": "8e32e8b7-bb98-4044-8bd6-8c838f679ed7"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "4bd8e083-208c-44e9-869c-98b5317a4161",
-              "leftValue": "={{ $json.COMPARATIVA }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "exists",
-                "singleValue": true
-              }
-            },
-            {
-              "id": "d91f2250-07d6-4de2-86f7-a5c82f4a506c",
-              "leftValue": "={{ $json.SUGERENCIAS }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "exists",
-                "singleValue": true
-              }
-            },
-            {
-              "id": "a1478240-4db3-4f60-8583-f377dbe0c2ef",
-              "leftValue": "={{ $json.VEREDICTO_TEXTO }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "exists",
-                "singleValue": true
-              }
-            },
-            {
-              "id": "733cadcc-a8fa-4ad7-a43c-bc05a1f909d6",
-              "leftValue": "={{ $json.CONCLUSION }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "exists",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        4064,
-        1584
-      ],
-      "id": "747c005e-3c0a-463a-99bb-5bf57d8c1924",
-      "name": "Validation Sections"
     },
     {
       "parameters": {
@@ -1819,14 +1723,15 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        4512,
-        1568
+        4720,
+        1600
       ],
       "id": "9181facb-a53d-4628-bd44-5092fe0337bd",
       "name": "Copy Analyses Format",
+      "retryOnFail": true,
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -1839,11 +1744,12 @@
       "type": "n8n-nodes-base.googleDocs",
       "typeVersion": 2,
       "position": [
-        4304,
-        1568
+        4512,
+        1600
       ],
       "id": "2bd0bfc8-8bb4-49d7-a644-1190a950dbb6",
       "name": "Get Analyses Format",
+      "retryOnFail": true,
       "credentials": {
         "googleDocsOAuth2Api": {
           "id": "mR1k1lJgFz3Uk3ju",
@@ -1861,8 +1767,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        4160,
-        1200
+        3968,
+        1232
       ],
       "id": "78e2a926-b37b-417e-8e41-ca97ccc26d23",
       "name": "Send Final Email",
@@ -1881,8 +1787,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3760,
-        1200
+        3568,
+        1232
       ],
       "id": "bf1a5b0f-c387-43be-b20a-874837fe93c9",
       "name": "Final Email"
@@ -1896,25 +1802,25 @@
             {
               "action": "replaceAll",
               "text": "[VEREDICTO_TEXTO]",
-              "replaceText": "={{ $('Code in JavaScript').item.json.VEREDICTO_TEXTO }}",
+              "replaceText": "={{ $('Section Matcher').item.json.VEREDICTO_TEXTO }}",
               "matchCase": true
             },
             {
               "action": "replaceAll",
               "text": "[CONCLUSION]",
-              "replaceText": "={{ $('Code in JavaScript').item.json.CONCLUSION }}",
+              "replaceText": "={{ $('Section Matcher').item.json.CONCLUSION }}",
               "matchCase": true
             },
             {
               "action": "replaceAll",
               "text": "=[COMPARATIVA]",
-              "replaceText": "={{ $('Code in JavaScript').item.json.COMPARATIVA }}",
+              "replaceText": "={{ $('Section Matcher').item.json.COMPARATIVA }}",
               "matchCase": true
             },
             {
               "action": "replaceAll",
               "text": "[SUGERENCIAS]",
-              "replaceText": "={{ $('Code in JavaScript').item.json.SUGERENCIAS }}",
+              "replaceText": "={{ $('Section Matcher').item.json.SUGERENCIAS }}",
               "matchCase": true
             },
             {
@@ -1933,11 +1839,12 @@
       "type": "n8n-nodes-base.googleDocs",
       "typeVersion": 2,
       "position": [
-        4720,
-        1568
+        4928,
+        1600
       ],
       "id": "bceb78c9-5d65-4255-a49b-53e526ec927c",
       "name": "Insert Text For Analyses",
+      "retryOnFail": true,
       "credentials": {
         "googleDocsOAuth2Api": {
           "id": "mR1k1lJgFz3Uk3ju",
@@ -1976,11 +1883,12 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        4800,
-        1760
+        5024,
+        1792
       ],
       "id": "4d9366d2-9511-450b-8eeb-5d1ea9255507",
       "name": "Get Indeed Jobs Row",
+      "retryOnFail": true,
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "paQ9mTdJ9l2YVFu4",
@@ -1991,8 +1899,8 @@
     {
       "parameters": {
         "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# 📝Processing Jobs",
-        "height": 384,
-        "width": 4752,
+        "height": 464,
+        "width": 4368,
         "color": 4
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -2007,14 +1915,14 @@
     {
       "parameters": {
         "content": "# 📝AI Assistant",
-        "height": 784,
-        "width": 1744,
+        "height": 800,
+        "width": 2160,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        3232,
-        1184
+        3024,
+        1216
       ],
       "typeVersion": 1,
       "id": "b1fc06d6-01a6-41af-b95c-cbc4f3fe564c",
@@ -2029,8 +1937,8 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        720,
-        1264
+        3024,
+        2064
       ],
       "typeVersion": 1,
       "id": "96aa719e-085f-4f9d-82ba-7e4228ae2363",
@@ -2045,25 +1953,24 @@
           "cachedResultName": "Indeed Scraper (misceres/indeed-scraper)",
           "cachedResultUrl": "https://console.apify.com/actors/hMvNSpz3JnHgl5jkh/input"
         },
-        "customBody": "={\n    \"country\": \"{{ $json.country }}\",\n    \"followApplyRedirects\": false,\n    \"maxItems\": {{ $json['Number of Jobs'] }},\n    \"parseCompanyDetails\": true,\n    \"position\": \"{{ $json.Keywords }}\",\n    \"saveOnlyUniqueItems\": true\n}",
-        "timeout": {}
+        "customBody": "={\n    \"country\": \"{{ $json.country }}\",\n    \"followApplyRedirects\": false,\n    \"maxItems\": {{ $json['Number of Jobs'] }},\n    \"parseCompanyDetails\": true,\n    \"position\": \"{{ $json.Keywords }}\",\n    \"saveOnlyUniqueItems\": true\n}"
       },
       "type": "@apify/n8n-nodes-apify.apify",
       "typeVersion": 1,
       "position": [
-        992,
-        928
+        960,
+        1008
       ],
       "id": "d64ea10d-0489-4903-951a-30e8a5898d7f",
       "name": "Search Jobs",
       "executeOnce": true,
+      "retryOnFail": true,
       "credentials": {
         "apifyApi": {
           "id": "Fy79u2f3bRzKEGHs",
           "name": "Apify account"
         }
-      },
-      "disabled": true
+      }
     },
     {
       "parameters": {
@@ -2074,8 +1981,8 @@
       "type": "@apify/n8n-nodes-apify.apify",
       "typeVersion": 1,
       "position": [
-        1328,
-        928
+        1312,
+        1008
       ],
       "id": "9ea4c01a-ffc9-43a4-abf6-558f3b1f633b",
       "name": "Get Jobs items",
@@ -2105,14 +2012,14 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        4192,
+        3776,
         752
       ],
       "id": "f938c7f8-1ff9-44f0-ba28-d2385f38aced",
       "name": "Create folder",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -2144,7 +2051,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        3840,
+        3424,
         768
       ],
       "id": "7e01da10-2792-4004-8081-7e8137ba4ca4",
@@ -2166,81 +2073,16 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        3456,
+        3024,
         768
       ],
       "id": "e5ffe23a-dd9c-40b8-bcd3-9841d18264b8",
       "name": "Search files and folders2",
       "alwaysOutputData": true,
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
-          "name": "Google Drive account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "fileFolder",
-        "queryString": "=Análisis-{{ $now.format('yyyy-MM-dd') }}",
-        "filter": {
-          "folderId": {
-            "__rl": true,
-            "value": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu clave de acceso\"] }}",
-            "mode": "id"
-          },
-          "whatToSearch": "folders",
-          "includeTrashed": false
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        4304,
-        1760
-      ],
-      "id": "d1f16917-8ad7-4863-b6c7-07115a86a627",
-      "name": "Search files and folders3",
       "retryOnFail": true,
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
-          "name": "Google Drive account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "move",
-        "fileId": {
-          "__rl": true,
-          "value": "={{ $('Copy Analyses Format').item.json.id }}",
-          "mode": "id"
-        },
-        "driveId": {
-          "__rl": true,
-          "mode": "list",
-          "value": "My Drive"
-        },
-        "folderId": {
-          "__rl": true,
-          "value": "={{ $json.id }}",
-          "mode": "id"
-        }
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        4480,
-        1760
-      ],
-      "id": "e008d3f8-679e-4641-8924-9b2ab1c548ed",
-      "name": "Move file1",
-      "retryOnFail": true,
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "x05Gb0mHR54rODlO",
+          "id": "15FJLaS1wPjm6Xc7",
           "name": "Google Drive account"
         }
       }
@@ -2250,8 +2092,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        4016,
-        928
+        3616,
+        912
       ],
       "id": "7e508b92-11a5-45a2-93ae-e494b7e64f29",
       "name": "No Operation, do nothing1"
@@ -2261,7 +2103,7 @@
       "type": "n8n-nodes-base.limit",
       "typeVersion": 1,
       "position": [
-        4032,
+        3616,
         752
       ],
       "id": "e6041f9c-e18c-4a8c-8059-269aa184ab56",
@@ -2274,8 +2116,8 @@
       "type": "n8n-nodes-base.removeDuplicates",
       "typeVersion": 2,
       "position": [
-        3552,
-        1200
+        3360,
+        1232
       ],
       "id": "e4200238-1d88-4773-9e0a-741c420540c2",
       "name": "Remove Duplicates1"
@@ -2287,7 +2129,7 @@
       "type": "n8n-nodes-base.removeDuplicates",
       "typeVersion": 2,
       "position": [
-        3664,
+        3232,
         768
       ],
       "id": "52176ca0-68b8-4e64-9309-80116c32e4d2",
@@ -2300,26 +2142,11 @@
       "type": "n8n-nodes-base.removeDuplicates",
       "typeVersion": 2,
       "position": [
-        3552,
-        1344
+        3360,
+        1408
       ],
       "id": "313ccd7f-6bfd-4e4a-8248-d6e0cc63b9ec",
       "name": "Remove Duplicates3"
-    },
-    {
-      "parameters": {
-        "compare": "selectedFields",
-        "fieldsToCompare": "['Position Name'], ['Company Name'], ['Company Description']",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.removeDuplicates",
-      "typeVersion": 2,
-      "position": [
-        2016,
-        768
-      ],
-      "id": "3db2df84-9892-415a-b633-147e0d171034",
-      "name": "Remove Duplicates4"
     },
     {
       "parameters": {
@@ -2327,17 +2154,17 @@
         "operation": "Get run",
         "runId": {
           "__rl": true,
-          "value": "oSpVvMSUhxVRbBXt8",
+          "value": "rIt1o4FGemJE6xLtP",
           "mode": "list",
-          "cachedResultName": "Thu Nov 20 2025 4:07:46 PM - SUCCEEDED",
-          "cachedResultUrl": "https://console.apify.com/runs/oSpVvMSUhxVRbBXt8"
+          "cachedResultName": "Tue Dec 02 2025 11:09:49 AM - SUCCEEDED",
+          "cachedResultUrl": "https://console.apify.com/runs/rIt1o4FGemJE6xLtP"
         }
       },
       "type": "@apify/n8n-nodes-apify.apify",
       "typeVersion": 1,
       "position": [
-        1168,
-        928
+        1136,
+        1008
       ],
       "id": "7028f694-35c9-43cf-b4bd-9f893aba6269",
       "name": "Get runs",
@@ -2346,7 +2173,9 @@
           "id": "Fy79u2f3bRzKEGHs",
           "name": "Apify account"
         }
-      }
+      },
+      "disabled": true,
+      "notes": "Testing node to not spent credit for Indeed Job Scrapper."
     },
     {
       "parameters": {
@@ -2356,7 +2185,7 @@
       "typeVersion": 2,
       "position": [
         1488,
-        928
+        1008
       ],
       "id": "201c6b1e-89c0-4044-9279-f6acb31646a7",
       "name": "DateProcessor",
@@ -2423,7 +2252,7 @@
             {
               "id": "d46aa938-39f6-43c1-8838-e5e5daf212d5",
               "name": "Company Website",
-              "value": "",
+              "value": "={{ $json.companyInfo.url }}",
               "type": "string"
             },
             {
@@ -2452,56 +2281,178 @@
       "typeVersion": 3.4,
       "position": [
         1664,
-        928
+        1008
       ],
       "id": "392e10bd-a3e3-42e5-aec7-ac5ac76675d2",
       "name": "Edit Fields"
     },
     {
       "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "={{ $('Search files and folders').item.json.id }}",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 1202194973,
-          "mode": "list",
-          "cachedResultName": "Indeed Jobs",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GQ_iVPqGOrenNZaMcpIkCv9efRuzj4kb6nfQa_srebs/edit#gid=1202194973"
-        },
-        "filtersUI": {
-          "values": [
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
             {
-              "lookupColumn": "Position Name",
-              "lookupValue": "={{ $json['Position Name'] }}"
-            },
-            {
-              "lookupColumn": "Company Name",
-              "lookupValue": "={{ $json['Company Name'] }}"
-            },
-            {
-              "lookupColumn": "Company Description",
-              "lookupValue": "={{ $json['Company Description'] }}"
+              "id": "38d643b4-4833-405b-88e9-88a464a163aa",
+              "leftValue": "={{ $json.content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
             }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3888,
+        1408
+      ],
+      "id": "22708655-7a00-4232-875c-24024fde66e3",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        3744,
+        1408
+      ],
+      "id": "18c6c4fb-3e9c-4a6b-b81f-0cb4b972a7cb",
+      "name": "Get User CV",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mR1k1lJgFz3Uk3ju",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu email\"] }}",
+        "filter": {
+          "driveId": {
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu clave de acceso\"] }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files",
+          "fileTypes": [
+            "application/vnd.google-apps.document"
           ]
         },
         "options": {}
       },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
       "position": [
-        2224,
-        768
+        3552,
+        1408
       ],
-      "id": "e8a9559e-d7b1-4f1d-9f10-43ed0030f71e",
-      "name": "Indeed Jobs Sheet (GET)1",
-      "alwaysOutputData": true,
+      "id": "0c349206-6115-400d-b20c-ecc46f0e8313",
+      "name": "Search User CV",
+      "retryOnFail": true,
       "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "paQ9mTdJ9l2YVFu4",
-          "name": "Google Sheets account"
+        "googleDriveOAuth2Api": {
+          "id": "15FJLaS1wPjm6Xc7",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst result = items.map((item) => {\n    // Asume que el texto de la IA está en 'content.parts[0].text'\n    const text = item.json.content.parts[0].text;\n    const parsedSections = {};\n\n    // 1. Expresión regular para encontrar los bloques.\n    // Captura el marcador [SECTION] y el contenido subsiguiente hasta el próximo marcador.\n    // [\\s\\S]*? - Captura cualquier carácter, incluyendo saltos de línea, de forma no codiciosa.\n    // Usamos el flag 'g' para encontrar todas las coincidencias.\n    const regex = /\\[(\\w+)\\]([\\s\\S]*?)(?=\\[|$)/g; \n    \n    let match;\n\n    // 2. Iterar sobre todas las coincidencias encontradas\n    while ((match = regex.exec(text)) !== null) {\n        // match[1]: Contiene el nombre del marcador (ej., COMPARATIVA)\n        const sectionName = match[1].trim(); \n        \n        // match[2]: Contiene el contenido de la sección (con el \\n inicial)\n        let sectionContent = match[2];\n        \n        // 3. Limpieza: Eliminar cualquier espacio o salto de línea al inicio\n        // que pudiera haber quedado justo después del corchete de apertura.\n        // Pero no el salto de línea de la primera línea de contenido.\n        // Por lo general, 'trim()' no es lo que queremos, pero aquí aseguramos limpiar \n        // solo el exceso de espacio/saltos de línea alrededor de la sección.\n        if (sectionContent) {\n            // El primer caracter después del marcador es el que queremos preservar\n            // No usamos trim() aquí para preservar el '\\n' inicial si existe.\n            sectionContent = sectionContent.trim();\n        }\n\n        // 4. Asignar el contenido a la propiedad correspondiente\n        parsedSections[sectionName] = sectionContent;\n    }\n\n    return { json: parsedSections, pairedItem: item.pairedItem };\n});\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4336,
+        1392
+      ],
+      "id": "5804e3b3-301c-4981-b39e-e5ae66d8677b",
+      "name": "Section Matcher"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=Análisis-{{ $now.format('yyyy-MM-dd') }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $('Aggregate').item.json.Access_Key[0][\"Ingresa tu clave de acceso\"] }}",
+            "mode": "id"
+          },
+          "whatToSearch": "folders",
+          "includeTrashed": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4512,
+        1792
+      ],
+      "id": "d1f16917-8ad7-4863-b6c7-07115a86a627",
+      "name": "Search Analyses File",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "15FJLaS1wPjm6Xc7",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Copy Analyses Format').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4672,
+        1792
+      ],
+      "id": "e008d3f8-679e-4641-8924-9b2ab1c548ed",
+      "name": "Move Analyses File",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "15FJLaS1wPjm6Xc7",
+          "name": "Google Drive account"
         }
       }
     },
@@ -2516,33 +2467,43 @@
           },
           "conditions": [
             {
-              "id": "828d3daa-c4d2-4f98-aa46-b7808ae46ba7",
-              "leftValue": "={{ $json['Position Name'] }}",
-              "rightValue": "={{ $('Remove Duplicates4').item.json['Position Name'] }}",
+              "id": "4bd8e083-208c-44e9-869c-98b5317a4161",
+              "leftValue": "={{ $json.COMPARATIVA }}",
+              "rightValue": "",
               "operator": {
                 "type": "string",
-                "operation": "equals",
-                "name": "filter.operator.equals"
+                "operation": "exists",
+                "singleValue": true
               }
             },
             {
-              "id": "1bab6fd1-cab4-4ee2-b701-3686dcf6b25d",
-              "leftValue": "={{ $json['Company Name'] }}",
-              "rightValue": "={{ $('Remove Duplicates4').item.json['Company Name'] }}",
+              "id": "d91f2250-07d6-4de2-86f7-a5c82f4a506c",
+              "leftValue": "={{ $json.SUGERENCIAS }}",
+              "rightValue": "",
               "operator": {
                 "type": "string",
-                "operation": "equals",
-                "name": "filter.operator.equals"
+                "operation": "exists",
+                "singleValue": true
               }
             },
             {
-              "id": "f50c7bae-20b1-40af-bc85-f05d84460d98",
-              "leftValue": "={{ $json['Company Description'] }}",
-              "rightValue": "={{ $('Remove Duplicates4').item.json['Company Description'] }}",
+              "id": "a1478240-4db3-4f60-8583-f377dbe0c2ef",
+              "leftValue": "={{ $json.VEREDICTO_TEXTO }}",
+              "rightValue": "",
               "operator": {
                 "type": "string",
-                "operation": "equals",
-                "name": "filter.operator.equals"
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "733cadcc-a8fa-4ad7-a43c-bc05a1f909d6",
+              "leftValue": "={{ $json.CONCLUSION }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
               }
             }
           ],
@@ -2553,22 +2514,74 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2432,
-        768
+        4304,
+        1616
       ],
-      "id": "83eb65a3-a2c9-4a1d-b313-36505889b149",
-      "name": "If3"
+      "id": "747c005e-3c0a-463a-99bb-5bf57d8c1924",
+      "name": "Section Validator"
     },
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "[\"Position Name\"], [\"Company Name\"], [\"Company Description\"]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
       "position": [
-        2656,
-        592
+        2160,
+        784
       ],
-      "id": "6f54b6b3-3fcc-4578-b5bb-a6326aa7e305",
-      "name": "No Operation, do nothing3"
+      "id": "6a3c80d3-06e5-45d6-8f38-1641e49e471a",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1202194973,
+          "mode": "list",
+          "cachedResultName": "Indeed Jobs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16PMUUMf7ZqWROXnD_-bFQSildwooqnEBbeoK77Iscms/edit#gid=1202194973"
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1040,
+        848
+      ],
+      "id": "9e87b603-b64c-4148-a058-4a4b745cb050",
+      "name": "Jobs Sheet List",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "paQ9mTdJ9l2YVFu4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Filtrar trabajos recién scrappeados contra \n * la lista maestra del Sheet.\n */\nfunction filterNewJobs(scrappedItems) {\n    const newJobsToInsert = [];\n    \n    // Acceder a la lista completa de trabajos ya existentes en el Sheet\n    // Usamos $() para obtener los ítems del nodo 'Jobs Sheet List'\n    const existingSheetItems = $items(\"Jobs Sheet List\"); \n\n    // 1. Construir un conjunto (Set) de claves compuestas de los trabajos existentes\n    const existingKeys = new Set();\n    \n    for (const item of existingSheetItems) {\n        const job = item.json;\n        \n        // Crear la clave compuesta (Key Compound) para la comparación\n        const key = `${job[\"Position Name\"]?.toLowerCase() || ''} | ${job[\"Company Name\"]?.toLowerCase() || ''} | ${job[\"Company Description\"]?.toLowerCase() || ''}`;\n        existingKeys.add(key);\n    }\n\n    // 2. Filtrar los trabajos recién scrappeados (scrappedItems)\n    const processedScrapperKeys = new Set(); // Para manejar duplicados dentro del Scrapper\n\n    for (const item of scrappedItems) {\n        const job = item.json;\n        \n        // Crear la clave compuesta para el job actual\n        const key = `${job[\"Position Name\"]?.toLowerCase() || ''} | ${job[\"Company Name\"]?.toLowerCase() || ''} | ${job[\"Company Description\"]?.toLowerCase() || ''}`;\n        \n        // 3. Verificar si el trabajo ya existe en el Sheet y si no es un duplicado interno\n        const isExistingInSheet = existingKeys.has(key);\n        const isDuplicateInScrapper = processedScrapperKeys.has(key);\n\n        if (!isExistingInSheet && !isDuplicateInScrapper) {\n            // El trabajo es completamente nuevo y no es un duplicado interno.\n            newJobsToInsert.push(item);\n            processedScrapperKeys.add(key);\n        }\n    }\n    \n    // 4. Retornar solo los trabajos nuevos\n    return newJobsToInsert;\n}\n\n// ----------------------------------------------------------------------\n// Lógica de Ejecución (Punto de entrada de n8n)\n// ----------------------------------------------------------------------\n\n// El input del nodo Code es la salida del Scrapper (Edit Fields)\n// Usamos 'items' que contiene los ítems de entrada de este nodo.\nreturn filterNewJobs(items);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        848
+      ],
+      "id": "aa7889b6-e300-4989-bb42-59b8a9b1163f",
+      "name": "DuplicateFilter"
     }
   ],
   "pinData": {
@@ -2577,7 +2590,7 @@
         "json": {
           "Ingresa tu email": "zaizor.black@gmail.com",
           "Ingresa tu clave de acceso": "1V6P0wJS6HdA-rJhsb-kdR0wXP4iGlJsq",
-          "submittedAt": "2025-11-17T14:57:30.870-05:00",
+          "submittedAt": "2025-12-02T12:18:59.862-05:00",
           "formMode": "test"
         }
       }
@@ -2733,6 +2746,11 @@
             "index": 0
           },
           {
+            "node": "Jobs Sheet List",
+            "type": "main",
+            "index": 0
+          },
+          {
             "node": "Merge",
             "type": "main",
             "index": 0
@@ -2744,7 +2762,7 @@
       "main": [
         [
           {
-            "node": "Remove Duplicates4",
+            "node": "Remove Duplicates",
             "type": "main",
             "index": 0
           }
@@ -3081,62 +3099,11 @@
         ]
       ]
     },
-    "Search files and folders1": {
-      "main": [
-        [
-          {
-            "node": "Get a document1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get a document1": {
-      "main": [
-        [
-          {
-            "node": "Coach experto",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript": {
-      "main": [
-        [
-          {
-            "node": "Validation Sections",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Coach experto": {
       "main": [
         [
           {
-            "node": "Code in JavaScript",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Validation Sections": {
-      "main": [
-        [
-          {
-            "node": "Get Analyses Format",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Coach experto",
+            "node": "Section Matcher",
             "type": "main",
             "index": 0
           }
@@ -3191,7 +3158,7 @@
       "main": [
         [
           {
-            "node": "Search files and folders3",
+            "node": "Search Analyses File",
             "type": "main",
             "index": 0
           }
@@ -3265,28 +3232,6 @@
         ]
       ]
     },
-    "Search files and folders3": {
-      "main": [
-        [
-          {
-            "node": "Move file1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Move file1": {
-      "main": [
-        [
-          {
-            "node": "Update Indeed Jobs Sheet",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Limit1": {
       "main": [
         [
@@ -3324,18 +3269,7 @@
       "main": [
         [
           {
-            "node": "Search files and folders1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Remove Duplicates4": {
-      "main": [
-        [
-          {
-            "node": "Indeed Jobs Sheet (GET)1",
+            "node": "Search User CV",
             "type": "main",
             "index": 0
           }
@@ -3368,18 +3302,7 @@
       "main": [
         [
           {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "Indeed Jobs Sheet (GET)1": {
-      "main": [
-        [
-          {
-            "node": "If3",
+            "node": "DuplicateFilter",
             "type": "main",
             "index": 0
           }
@@ -3390,16 +3313,122 @@
       "main": [
         [
           {
-            "node": "No Operation, do nothing3",
+            "node": "Coach experto",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
+            "node": "Search User CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User CV": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search User CV": {
+      "main": [
+        [
+          {
+            "node": "Get User CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Section Matcher": {
+      "main": [
+        [
+          {
+            "node": "Section Validator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Analyses File": {
+      "main": [
+        [
+          {
+            "node": "Move Analyses File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Analyses File": {
+      "main": [
+        [
+          {
+            "node": "Update Indeed Jobs Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Section Validator": {
+      "main": [
+        [
+          {
+            "node": "Get Analyses Format",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search User CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
             "node": "Indeed Jobs Sheet (SET)",
             "type": "main",
             "index": 0
+          }
+        ]
+      ]
+    },
+    "Jobs Sheet List": {
+      "main": [
+        [
+          {
+            "node": "DuplicateFilter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DuplicateFilter": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
           }
         ]
       ]
@@ -3409,7 +3438,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "8a393b3b-dcfe-4901-9b2c-760c426850aa",
+  "versionId": "a0088617-6adf-4d48-8ead-6c8fb7db86e3",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "c9679bb0ef3e09745ced1e7ef2b596744bbd4242cd22d4ea9d3fed4a688906b3"
